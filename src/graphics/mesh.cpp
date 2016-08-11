@@ -61,4 +61,22 @@ namespace RedFox
 		glBindVertexArray(m_handle);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
+
+	//=====================================================================================================================================
+
+	Mesh::Mesh()
+	{
+	}
+
+	//Crea mesh tramite vertici, indici e materiale
+	Mesh::Mesh(const vector<Vertex>& _vertices, const vector<u32>& _indices)
+		: m_shape(_vertices, _indices)
+	{
+	}
+
+	void Mesh::render(StandardTechnique* _technique) const
+	{
+		_technique->setTransform(transform);
+		m_shape.render();
+	}
 }

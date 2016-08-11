@@ -11,6 +11,9 @@ namespace RedFox
 		//Crea finestra
 		m_window = new Window("RedFox Engine", 1660, 900);
 
+		//Crea renderer
+		MeshRenderer* m_renderer = new MeshRenderer();
+
 		//TODO: Crea sistemi
 	}
 
@@ -40,5 +43,6 @@ namespace RedFox
 	{
 		_application->Assets = m_assets;
 		_application->Window = m_window;
+		_application->Renderer = m_renderer;
 	}
 }

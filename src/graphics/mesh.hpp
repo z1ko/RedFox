@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../graphics/renderer.hpp"
 
 namespace RedFox
 {
@@ -95,5 +96,22 @@ namespace RedFox
 			IdxBuffer m_idxBuffer;
 
 			u32 m_handle;
+	};
+
+	class Mesh : public IRenderable
+	{
+		public:
+			Mesh();
+			//Crea mesh tramite vertici, indici e materiale
+			Mesh(const vector<Vertex>& _vertices, const vector<u32>& _indices);
+
+			//Renderizza questa forma
+			void render(StandardTechnique* _technique) const;
+
+		public:
+			Transform transform;
+
+		private:
+			Shape m_shape;
 	};
 }

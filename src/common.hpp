@@ -11,6 +11,7 @@
 //Matematica
 #include "../ext/glm/include/glm.hpp"
 #include "../ext/glm/include/gtc/type_ptr.hpp"
+#include "../ext/glm/include/gtc/matrix_transform.hpp"
 
 #define RFX_WARNING(text)\
 printf("[WRN]: %s", text)
@@ -44,7 +45,4 @@ namespace RedFox
 	using glm::mat4;
 
 	//======================================================================
-
-	//Legge il testo di un file
-	string read_file_text(const string& _filename);
 }

@@ -2,6 +2,9 @@
 
 #include "../common.hpp"
 
+#include "camera.hpp"
+#include "transform.hpp"
+
 namespace RedFox
 {
 	//Singolo stage di una tecnica
@@ -27,14 +30,10 @@ namespace RedFox
 			Technique();
 
 			//Crea tecnica dalle source degli shader
-			Technique(const string& _vtx, const string& _frg);
+			Technique(const Shader& _vtx, const Shader& _frg);
 
 			//Usa questa tecnica di rendering
 			void enable() const;
-
-		private:
-			Shader m_vtxShader;
-			Shader m_frgShader;
 
 		protected:
 			u32 m_handle;
@@ -44,6 +43,8 @@ namespace RedFox
 	class GenericTechnique : public Technique
 	{
 		public:
+			GenericTechnique(const Shader& _vtx, const Shader& _frg);
+
 			template<typename T>
 			void setUniform(const string& _name, const T& _value);
 
@@ -52,5 +53,16 @@ namespace RedFox
 
 		private:
 			umap<string, u32> m_locations;
+	};
+
+	//Tecnica standard, accetta telecamera e transform
+	class StandardTechnique : public GenericTechnique
+	{
+		public:
+			//Usa shaders predefiniti
+			StandardTechnique(const Shader& _vtx, const Shader& _frg);
+
+			void setCamera(const Camera& _camera);
+			void setTransform(const Transform& _transform);
 	};
 }

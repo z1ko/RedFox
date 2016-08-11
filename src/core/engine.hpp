@@ -3,6 +3,7 @@
 #include "../common.hpp"
 #include "../graphics/window.hpp"
 #include "../assets/database.hpp"
+#include "../graphics/renderer.hpp"
 
 namespace RedFox
 {
@@ -16,7 +17,8 @@ namespace RedFox
 		public:
 			//Finestra
 			Window* Window;
-
+			//Classe che renderizza le mesh nella scena
+			MeshRenderer* Renderer;
 			//Contenitore di tutte le risorse
 			AssetsDatabase* Assets;
 	};
@@ -38,7 +40,8 @@ namespace RedFox
 		private:
 			//Finestra
 			Window* m_window;
-
+			//Classe che renderizza le mesh nella scena
+			MeshRenderer* m_renderer;
 			//Contenitore di tutte le risorse
 			AssetsDatabase* m_assets;
 	};

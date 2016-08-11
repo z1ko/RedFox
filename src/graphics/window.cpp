@@ -16,10 +16,10 @@ namespace RedFox
 		glewInit();
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		//glViewport(0, 0, _width, _height);
+		glViewport(0, 0, _width, _height);
 
-		//glEnable(GL_CULL_FACE);
-		//glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
@@ -28,7 +28,7 @@ namespace RedFox
 	bool Window::update()
 	{
 		glfwSwapBuffers(m_handle);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glfwPollEvents();
 

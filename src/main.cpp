@@ -1,7 +1,10 @@
 #include "core/engine.hpp"
+#include "utils\io.hpp"
 
 #include "graphics/mesh.hpp"
 #include "graphics/technique.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/transform.hpp"
 
 using namespace RedFox;
 
@@ -22,13 +25,17 @@ class Sandbox : public Application
 	public:
 		void onInit()
 		{
-			m_shape = new Shape(vertices, indices);
+			camera = new Camera(glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.1f, 100.0f));
+			camera->position = vec3(0, 0, 2);
+
+			triangle = new Mesh(vertices, indices);
+			triangle->transform.position = vec3(0, 0, 0);
 		}
 
 		void onUpdate()
 		{
-			m_technique->enable();
-			m_shape->render();
+			Renderer->submit(triangle);
+			Renderer->flush(*camera);
 		}
 
 		void onShutdown()
@@ -36,8 +43,8 @@ class Sandbox : public Application
 		}
 
 	private:
-		GenericTechnique* m_technique;
-		Shape* m_shape;
+		Camera* camera;
+		Mesh* triangle;
 };
 
 int main(int _argc, char** _argv)
