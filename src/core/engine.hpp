@@ -1,13 +1,24 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../graphics/window.hpp"
+#include "../assets/database.hpp"
 
 namespace RedFox
 {
 	class Application
 	{
 		public:
-			virtual void update() = 0;
+			virtual void onInit() = 0;
+			virtual void onUpdate() = 0;
+			virtual void onShutdown() = 0;
+
+		public:
+			//Finestra
+			Window* Window;
+
+			//Contenitore di tutte le risorse
+			AssetsDatabase* Assets;
 	};
 
 	//Classe principale
@@ -19,5 +30,16 @@ namespace RedFox
 
 			//Esegue un applicazione, blocca esecuzione
 			void execute(Application* _application);
+
+		private:
+			//Connette tutti i sistemi all'applicazione
+			void connect(Application* _application);
+
+		private:
+			//Finestra
+			Window* m_window;
+
+			//Contenitore di tutte le risorse
+			AssetsDatabase* m_assets;
 	};
 }
