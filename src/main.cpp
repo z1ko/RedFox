@@ -1,41 +1,44 @@
 #include "core/engine.hpp"
+#include "core/engine.hpp"
 #include "utils\io.hpp"
 
-#include "graphics/mesh.hpp"
+#include "graphics/model.hpp"
 #include "graphics/technique.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/transform.hpp"
+#include "graphics/renderer.hpp"
 
 using namespace RedFox;
 
-const vector<Vertex> vertices = 
+const vector<Sampler> samplers = 
 {
-	{{ -0.5f, -0.5f, 0.0f }},
-	{{  0.5f, -0.5f, 0.0f }},
-	{{  0.0f,  0.5f, 0.0f }}
+	{ 0, "albedo" }
 };
 
-const vector<u32> indices = 
-{
-	0,1,2
-};
+Renderer renderer;
 
 class Sandbox : public Application
 {
+	RenderCommand command;
+
 	public:
 		void onInit()
 		{
-			camera = new Camera(glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.1f, 100.0f));
-			camera->position = vec3(0, 0, 2);
+			command.transform = &transform;
 
-			triangle = new Mesh(vertices, indices);
-			triangle->transform.position = vec3(0, 0, 0);
+			command.technique = Database::create<Technique>("standard", StandardTechnique());
+			command.model = Database::create<Model>("nanosuit", "C:/Development/RedFox/RedFox/res/models/nanosuit.obj");
+
+			camera = Camera(glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.1f, 100.0f));
+			camera.position = vec3(0, 7, 14);
 		}
 
 		void onUpdate()
 		{
-			Renderer->submit(triangle);
-			Renderer->flush(*camera);
+			transform.orientation.z += 0.01f;
+			renderer.submitCommand(command);
+
+			renderer.present(camera);
 		}
 
 		void onShutdown()
@@ -43,8 +46,8 @@ class Sandbox : public Application
 		}
 
 	private:
-		Camera* camera;
-		Mesh* triangle;
+		Camera camera;
+		Transform transform;
 };
 
 int main(int _argc, char** _argv)

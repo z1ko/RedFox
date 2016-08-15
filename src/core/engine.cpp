@@ -5,14 +5,8 @@ namespace RedFox
 	//Punto di ingresso
 	void Engine::initialize(int _argc, char** _argv)
 	{
-		//Crea contenitore risorse
-		m_assets = new AssetsDatabase();
-
-		//Crea finestra
+		//Crea finestringinga
 		m_window = new Window("RedFox Engine", 1660, 900);
-
-		//Crea renderer
-		MeshRenderer* m_renderer = new MeshRenderer();
 
 		//TODO: Crea sistemi
 	}
@@ -41,8 +35,6 @@ namespace RedFox
 	//Connette tutti i sistemi all'applicazione
 	void Engine::connect(Application* _application)
 	{
-		_application->Assets = m_assets;
 		_application->Window = m_window;
-		_application->Renderer = m_renderer;
 	}
 }

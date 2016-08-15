@@ -1,5 +1,7 @@
 #include "technique.hpp"
 
+#include "../utils/io.hpp"
+
 namespace RedFox
 {
 	//Crea shader nullo
@@ -9,7 +11,7 @@ namespace RedFox
 	}
 
 	//Crea shader da source
-	Shader::Shader(const string& _source, u32 _target)
+	Shader::Shader(const str& _source, u32 _target)
 	{
 		m_handle = glCreateShader(_target);
 
@@ -28,6 +30,12 @@ namespace RedFox
 		}
 	}
 
+	//Risolve #include
+	void Shader::resolve(str& _source)
+	{
+
+	}
+
 	//=====================================================================================================================================
 
 	//Tecnica nulla
@@ -37,7 +45,7 @@ namespace RedFox
 	}
 
 	//Crea tecnica dalle source degli shader
-	Technique::Technique(const Shader& _vtx, const Shader& _frg)
+	void Technique::initialize(const Shader& _vtx, const Shader& _frg)
 	{
 		m_handle = glCreateProgram();
 
@@ -65,16 +73,18 @@ namespace RedFox
 		glUseProgram(m_handle);
 	}
 
-	//=====================================================================================================================================
-
-	GenericTechnique::GenericTechnique(const Shader& _vtx, const Shader& _frg)
-		: Technique(_vtx, _frg)
+	void Technique::setSamplers(const vector<Sampler>& _samplers)
 	{
+		for (const auto& sampler : _samplers)
+		{
+			u32 loc = location(sampler.name);
+			glUniform1i(loc, sampler.slot);
+		}
 	}
 
-	u32 GenericTechnique::location(const string& _name)
+	u32 Technique::location(const str& _name)
 	{
-		//Se la uniform non è gia stata registrata allora viene aggiunta
+		//Se la uniform non è gia stata registringingata allora viene aggiunta
 		if(m_locations.find(_name) == m_locations.end())
 		{
 			u32 loc = glGetUniformLocation(m_handle, _name.c_str());
@@ -84,30 +94,45 @@ namespace RedFox
 	}
 
 	template<>
-	void GenericTechnique::setUniform<vec3>(const string& _name, const vec3& _value) {
+	void Technique::setUniform<vec3>(const str& _name, const vec3& _value) {
 		glUniform3f(location(_name), _value.x, _value.y, _value.z);
 	}
 
 	template<>
-	void GenericTechnique::setUniform<mat4>(const string& _name, const mat4& _value) {
+	void Technique::setUniform<mat4>(const str& _name, const mat4& _value) {
 		glUniformMatrix4fv(location(_name), 1, GL_FALSE, glm::value_ptr(_value));
 	}
 
-	//=====================================================================================================================================
-
-	StandardTechnique::StandardTechnique(const Shader& _vtx, const Shader& _frg)
-		: GenericTechnique(_vtx, _frg)
+	void Technique::setCamera(const Camera& _camera)
 	{
-	}
+		setUniform("camera.position", _camera.position);
 
-	void StandardTechnique::setCamera(const Camera& _camera)
-	{
 		setUniform("camera.view", _camera.view());
 		setUniform("camera.proj", _camera.proj());
 	}
 
-	void StandardTechnique::setTransform(const Transform& _transform)
+	void Technique::setTransform(const Transform& _transform)
 	{
 		setUniform("instance.model", _transform.model());
+	}
+
+	//=====================================================================================================================================
+
+	StandardTechnique::StandardTechnique()
+	{
+		Shader vtx(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/standard.vtx.glsl"), GL_VERTEX_SHADER);
+		Shader frg(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/standard.frg.glsl"), GL_FRAGMENT_SHADER);
+
+		initialize(vtx, frg);
+	}
+
+	//=====================================================================================================================================
+
+	FrameTechnique::FrameTechnique()
+	{
+		Shader vtx(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/final.vtx.glsl"), GL_VERTEX_SHADER);
+		Shader frg(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/final.frg.glsl"), GL_FRAGMENT_SHADER);
+
+		initialize(vtx, frg);
 	}
 }

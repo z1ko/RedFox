@@ -1,7 +1,10 @@
 #pragma once
 
 #include "../common.hpp"
-#include "../graphics/renderer.hpp"
+#include "../core/entity.hpp"
+
+#include "texture.hpp"
+#include "technique.hpp"
 
 namespace RedFox
 {
@@ -38,7 +41,7 @@ namespace RedFox
 				glBindBuffer(m_target, 0);
 			}
 
-			//Distrugge il buffer
+			//Distringingugge il buffer
 			~Buffer()
 			{
 				glDeleteBuffers(1, &m_handle);
@@ -60,58 +63,51 @@ namespace RedFox
 	struct Vertex
 	{
 		vec3 position;
-		//vec3 normal;
-		//vec2 texuv;
-
-		//Costruttori per comodità
-		Vertex(vec3 _position);
-
-		//Descrive il layout del vertice
-		static void describe();
+		vec3 normal;
+		vec2 uv;
 	};
 
 	using VtxBuffer = Buffer<Vertex>;
 	using IdxBuffer = Buffer<u32>;
 
-	class Shape
+	class Material
 	{
 		public:
-			//Oggetto nullo
-			Shape();
+			Material();
+			//Carica materiale con assimp
+			Material(const aiMaterial* _material);
 
-			//Crea forma tramite vertici e indici
-			Shape(const vector<Vertex>& _vertices, const vector<u32>& _indices);
-
-			//Distrugge oggetto
-			~Shape();
-
-			//Usa questo oggett nel contesto corrente
-			void bind() const;
-
-			//Renderizza questa forma
-			void render() const;
-
-		private:
-			VtxBuffer m_vtxBuffer;
-			IdxBuffer m_idxBuffer;
-
-			u32 m_handle;
+		public:
+			Texture albedo;
 	};
 
-	class Mesh : public IRenderable
+	class Mesh
 	{
 		public:
 			Mesh();
-			//Crea mesh tramite vertici, indici e materiale
-			Mesh(const vector<Vertex>& _vertices, const vector<u32>& _indices);
+			//Crea mesh tramite assimp
+			Mesh(const aiScene* _scene, const aiMesh* _mesh);
 
-			//Renderizza questa forma
-			void render(StandardTechnique* _technique) const;
-
-		public:
-			Transform transform;
+			//Renderizza mesh
+			void render() const;
 
 		private:
-			Shape m_shape;
+			u32 m_vao, m_vbo, m_ebo, m_count;
+			Material m_material;
 	};
+
+	class Model : public Component
+	{
+		public:
+			Model();
+			//Carica mesh da file
+			Model(const str& _filename);
+
+			//Renderizza tutte le mesh
+			void render() override;
+
+		private:
+			vector<Mesh> m_meshes;
+	};
+
 }

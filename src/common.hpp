@@ -1,7 +1,9 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <vector>
+#include <algorithm>
 #include <unordered_map>
 
 //Opengl
@@ -11,7 +13,19 @@
 //Matematica
 #include "../ext/glm/include/glm.hpp"
 #include "../ext/glm/include/gtc/type_ptr.hpp"
+#include "../ext/glm/include/gtc/quaternion.hpp"
+#include "../ext/glm/include/gtx/quaternion.hpp"
+#include "../ext/glm/include/gtx/euler_angles.hpp"
+#include "../ext/glm/include/gtx/rotate_vector.hpp"
 #include "../ext/glm/include/gtc/matrix_transform.hpp"
+
+//Caricamento modelli
+#include "../ext/assimp/include/scene.h"
+#include "../ext/assimp/include/Importer.hpp"
+#include "../ext/assimp/include/postprocess.h"
+
+//Caricamento immagini
+#include "../ext/soil/include/SOIL.h"
 
 #define RFX_WARNING(text)\
 printf("[WRN]: %s", text)
@@ -32,7 +46,7 @@ namespace RedFox
 
 	//======================================================================
 
-	using std::string;
+	using str = std::string;
 	using std::vector;
 
 	template<typename K, typename V>

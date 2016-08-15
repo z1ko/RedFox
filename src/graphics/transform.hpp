@@ -7,15 +7,14 @@ namespace RedFox
 	class Transform
 	{
 		public:
+			Transform();
+
 			//Crea trasformazione
 			mat4 model() const;
 
-			void attachTo(Transform* _parent);
-
 		public:
+			vec3 scale;
 			vec3 position;
-
-		private:
-			Transform* m_parent;
+			vec3 orientation;
 	};
 };

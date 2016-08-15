@@ -2,19 +2,19 @@
 
 namespace RedFox
 {
+	Transform::Transform()
+		: scale(1,1,1)
+	{
+	}
+
 	mat4 Transform::model() const
 	{
 		mat4 transformation;
 		transformation = glm::translate(transformation, position);
-		
-		if(m_parent != nullptr)
-			transformation *= m_parent->model();
+
+		transformation *= glm::orientate4(orientation);
+		transformation = glm::scale(transformation, scale);
 
 		return transformation;
-	}
-
-	void Transform::attachTo(Transform* _parent)
-	{
-		m_parent = _parent;
 	}
 }

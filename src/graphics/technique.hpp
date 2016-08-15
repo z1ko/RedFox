@@ -17,10 +17,20 @@ namespace RedFox
 			Shader();
 
 			//Crea shader da source
-			Shader(const string& _source, u32 _target);
+			Shader(const str& _source, u32 _target);
+
+		private:
+			//Risolve #include
+			void resolve(str& _source);
 
 		private:
 			u32 m_handle;
+	};
+
+	struct Sampler
+	{
+		u32	slot;
+		str name;
 	};
 
 	class Technique
@@ -29,40 +39,39 @@ namespace RedFox
 			//Tecnica nulla
 			Technique();
 
-			//Crea tecnica dalle source degli shader
-			Technique(const Shader& _vtx, const Shader& _frg);
-
 			//Usa questa tecnica di rendering
 			void enable() const;
 
-		protected:
-			u32 m_handle;
-	};
-
-	//Tecnica generica, può fare tutto
-	class GenericTechnique : public Technique
-	{
-		public:
-			GenericTechnique(const Shader& _vtx, const Shader& _frg);
-
 			template<typename T>
-			void setUniform(const string& _name, const T& _value);
+			void setUniform(const str& _name, const T& _value);
 
-		private:
-			u32 location(const string& _name);
-
-		private:
-			umap<string, u32> m_locations;
-	};
-
-	//Tecnica standard, accetta telecamera e transform
-	class StandardTechnique : public GenericTechnique
-	{
-		public:
-			//Usa shaders predefiniti
-			StandardTechnique(const Shader& _vtx, const Shader& _frg);
+			void setSamplers(const vector<Sampler>& _samplers);
 
 			void setCamera(const Camera& _camera);
 			void setTransform(const Transform& _transform);
+
+		protected:
+			//Crea tecnica
+			void initialize(const Shader& _vtx, const Shader& _frg);
+
+			u32 location(const str& _name);
+
+		protected:
+			u32 m_handle;
+			umap<str, u32> m_locations;
+	};
+
+	//Tecnica standard, accetta telecamera e transform
+	class StandardTechnique : public Technique
+	{
+		public:
+			//Usa shaders predefiniti
+			StandardTechnique();
+	};
+
+	class FrameTechnique : public Technique
+	{
+		public:
+			FrameTechnique();
 	};
 }

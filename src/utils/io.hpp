@@ -5,5 +5,5 @@
 namespace RedFox
 {
 	//Legge il testo di un file
-	string ReadFileText(const string& _filename);
+	str ReadFileText(const str& _filename);
 }

@@ -2,6 +2,11 @@
 
 namespace RedFox
 {
+	Camera::Camera()
+		: position(0,0,0)
+	{
+	}
+
 	Camera::Camera(const mat4 _projection)
 		: m_proj(_projection)
 	{

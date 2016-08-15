@@ -2,7 +2,7 @@
 
 namespace RedFox
 {
-	Window::Window(const string& _title, u32 _width, u32 _height)
+	Window::Window(const str& _title, u32 _width, u32 _height)
 	{
 		//Carica dll glfw
 		glfwInit();
@@ -15,7 +15,7 @@ namespace RedFox
 		//Carica estensioni opengl
 		glewInit();
 
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 		glViewport(0, 0, _width, _height);
 
 		glEnable(GL_CULL_FACE);

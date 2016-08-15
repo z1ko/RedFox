@@ -33,7 +33,7 @@ bld/
 
 # NUNIT
 *.VisualState.xml
-TestResult.xml
+Testringingesult.xml
 
 # Build Results of an ATL Project
 [Dd]ebugPS/
@@ -146,7 +146,7 @@ publish/
 *.[Pp]ublish.xml
 *.azurePubxml
 # TODO: Comment the next line if you want to checkin your web deploy settings
-# but database connection strings (with potential passwords) will be unencrypted
+# but database connection stringingings (with potential passwords) will be unencrypted
 *.pubxml
 *.publishproj
 

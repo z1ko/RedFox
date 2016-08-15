@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../resources/database.hpp"
+
 #include "../graphics/window.hpp"
-#include "../assets/database.hpp"
-#include "../graphics/renderer.hpp"
 
 namespace RedFox
 {
@@ -15,12 +15,8 @@ namespace RedFox
 			virtual void onShutdown() = 0;
 
 		public:
-			//Finestra
+			//Finestringinga
 			Window* Window;
-			//Classe che renderizza le mesh nella scena
-			MeshRenderer* Renderer;
-			//Contenitore di tutte le risorse
-			AssetsDatabase* Assets;
 	};
 
 	//Classe principale
@@ -38,11 +34,7 @@ namespace RedFox
 			void connect(Application* _application);
 
 		private:
-			//Finestra
+			//Finestringinga
 			Window* m_window;
-			//Classe che renderizza le mesh nella scena
-			MeshRenderer* m_renderer;
-			//Contenitore di tutte le risorse
-			AssetsDatabase* m_assets;
 	};
 }

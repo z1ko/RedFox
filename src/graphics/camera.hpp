@@ -7,6 +7,7 @@ namespace RedFox
 	class Camera
 	{
 		public:
+			Camera();
 			Camera(const mat4 _projection);
 
 			mat4 view() const;
