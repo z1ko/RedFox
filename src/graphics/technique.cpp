@@ -164,8 +164,15 @@ namespace RedFox
 		Shader frg(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/final.frg.glsl"), GL_FRAGMENT_SHADER);
 
 		initialize(vtx, frg);
+	}
 
-		//Setta slot per la texture generata dal frame
-		setUniform("frame", 0u);
+	//=====================================================================================================================================
+
+	SkyBoxTechnique::SkyBoxTechnique()
+	{
+		Shader vtx(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/skybox.vtx.glsl"), GL_VERTEX_SHADER);
+		Shader frg(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/skybox.frg.glsl"), GL_FRAGMENT_SHADER);
+
+		initialize(vtx, frg);
 	}
 }

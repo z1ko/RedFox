@@ -33,6 +33,12 @@ namespace RedFox
 		m_postProcess.reset(_process);
 	}
 
+	//Setta quale cubemap verrà usata per la skymap
+	void Renderer::setSkyBox(CubeMap* _cubeMap)
+	{
+		m_skyBox.reset(_cubeMap);
+	}
+
 	//Aggiunge un commando che verrà eseguito all'invocazione di flush
 	void Renderer::submitCommand(u32 _technique, u32 _material, u32 _model, Transform* _transform)
 	{
@@ -44,6 +50,27 @@ namespace RedFox
 	{
 		//TODO(?): Usa batches 
 		m_commands.push_back(_command);
+	}
+
+	void Renderer::renderSkyBox(const Camera& _camera)
+	{
+		static SkyBoxTechnique technique;
+		static Shape quad = Shape::Quad();
+
+		//Toglie la traslazione dalla matrice della telecamera
+		mat4 view = mat4(mat3(_camera.view()));
+
+		//Senza depth mask lo skybox viene renderizzato dietro tutti gli oggetti
+		glDepthMask(GL_FALSE);
+
+		technique.enable();
+		technique.setUniform("camera.view", view);
+		technique.setUniform("camera.proj", _camera.proj());
+
+		m_skyBox->bind();
+		quad.render();
+
+		glDepthMask(GL_TRUE);
 	}
 
 	//Sorta ed esegue tutti i comandi
@@ -59,6 +86,10 @@ namespace RedFox
 		std::sort(m_commands.begin(), m_commands.end());
 
 		renderingFrame.enable();
+
+		//Renderizza lo skybox sul fondo della scena
+		//if(m_skyBox) renderSkyBox(_camera);
+
 		for(const auto& command : m_commands)
 		{
 			//Cambia la tecnica solo se necessario

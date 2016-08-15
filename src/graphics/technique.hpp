@@ -73,4 +73,10 @@ namespace RedFox
 		public:
 			FrameTechnique();
 	};
+
+	class SkyBoxTechnique : public Technique
+	{
+		public:
+			SkyBoxTechnique();
+	};
 }

@@ -11,9 +11,14 @@
 
 using namespace RedFox;
 
-const vector<Sampler> samplers = 
+const array<str, 6> textures = 
 {
-	{ 0, "albedo" }
+	"C:/Development/RedFox/RedFox/res/textures/skyboxes/right.jpg",
+	"C:/Development/RedFox/RedFox/res/textures/skyboxes/left.jpg",
+	"C:/Development/RedFox/RedFox/res/textures/skyboxes/top.jpg",
+	"C:/Development/RedFox/RedFox/res/textures/skyboxes/bottom.jpg",
+	"C:/Development/RedFox/RedFox/res/textures/skyboxes/back.jpg",
+	"C:/Development/RedFox/RedFox/res/textures/skyboxes/front.jpg"
 };
 
 Renderer renderer;
@@ -32,7 +37,8 @@ class Sandbox : public Application
 			camera = Camera(glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.1f, 100.0f));
 			camera.position = vec3(0, 7, 14);
 
-			renderer.setPostProcess(new PostProcess("C:/Development/RedFox/RedFox/res/shaders/effects/sharpen.frg.glsl"));
+			//renderer.setPostProcess(new PostProcess("C:/Development/RedFox/RedFox/res/shaders/effects/sharpen.frg.glsl"));
+			renderer.setSkyBox(new CubeMap(textures));
 		}
 
 		void onUpdate()

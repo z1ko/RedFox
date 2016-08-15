@@ -15,6 +15,7 @@ namespace RedFox
 
 		public:
 			static Shape Screen();
+			static Shape Quad();
 
 		private:
 			u32 m_handle, m_count, m_vbo, m_ebo;

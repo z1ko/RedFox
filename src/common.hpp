@@ -4,6 +4,7 @@
 #include <sstream>
 #include <memory>
 #include <vector>
+#include <array>
 #include <algorithm>
 #include <unordered_map>
 
@@ -49,7 +50,9 @@ namespace RedFox
 
 	using str = std::string;
 	using std::stringstream;
+
 	using std::vector;
+	using std::array;
 
 	template<typename T>
 	using unique = std::unique_ptr<T>;
@@ -61,6 +64,7 @@ namespace RedFox
 
 	using glm::vec2;
 	using glm::vec3;
+	using glm::mat3;
 	using glm::mat4;
 
 	//======================================================================

@@ -6,6 +6,7 @@
 #include "../graphics/frame.hpp"
 #include "../graphics/model.hpp"
 #include "../graphics/camera.hpp"
+#include "../graphics/cubemap.hpp"
 #include "../graphics/postprocess.hpp"
 
 namespace RedFox
@@ -34,6 +35,9 @@ namespace RedFox
 			//TODO: Permetti di usare diverse stack di tecniche
 			void setPostProcess(PostProcess* _process);
 
+			//Setta quale cubemap verrà usata per la skymap
+			void setSkyBox(CubeMap* _cubeMap);
+
 			//Aggiunge un commando che verrà eseguito all'invocazione di flush
 			void submitCommand(u32 _technique, u32 _material, u32 _model, Transform* _transform);
 			void submitCommand(const RenderCommand& _command);
@@ -43,7 +47,11 @@ namespace RedFox
 			void present(const Camera& _camera);
 
 		private:
+			void renderSkyBox(const Camera& _camera);
+
+		private:
 			vector<RenderCommand> m_commands;
 			unique<PostProcess> m_postProcess;
+			unique<CubeMap> m_skyBox;
 	};
 }
