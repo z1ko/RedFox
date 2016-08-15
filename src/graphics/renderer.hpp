@@ -6,7 +6,7 @@
 #include "../graphics/frame.hpp"
 #include "../graphics/model.hpp"
 #include "../graphics/camera.hpp"
-#include "../graphics/technique.hpp"
+#include "../graphics/postprocess.hpp"
 
 namespace RedFox
 {
@@ -32,9 +32,10 @@ namespace RedFox
 
 			//Aggiunge un post process
 			//TODO: Permetti di usare diversi stack di tecniche
-			void pushPostProcess(u32 _technique);
+			void pushPostProcess(PostProcess* _process);
 
 			//Aggiunge un commando che verrà eseguito all'invocazione di flush
+			void submitCommand(u32 _technique, u32 _material, u32 _model, Transform* _transform);
 			void submitCommand(const RenderCommand& _command);
 
 			//Sorta ed esegue tutti i comandi
@@ -43,6 +44,6 @@ namespace RedFox
 
 		private:
 			vector<RenderCommand> m_commands;
-			vector<u32> m_postProcesses;
+			vector<unique<PostProcess>> m_postProcesses;
 	};
 }

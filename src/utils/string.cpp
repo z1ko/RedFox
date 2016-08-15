@@ -2,16 +2,17 @@
 
 namespace RedFox
 {
-	vector<str> split(const str& _text, char _delim)
+	vector<str> SplitLines(const str& _text)
 	{
 		vector<str> result;
 
-		stringstream ss(s);
-		string item;
-		while (getline(ss, item, delim)) {
-			elems.push_back(item);
+		stringstream ss(_text);
+		str item;
+		while (getline(ss, item))
+		{
+			if(!item.empty())
+				result.push_back(item);
 		}
-
 
 		return result;
 	}

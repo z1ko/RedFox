@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sstream>
+#include <memory>
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
@@ -47,7 +48,11 @@ namespace RedFox
 	//======================================================================
 
 	using str = std::string;
+	using std::stringstream;
 	using std::vector;
+
+	template<typename T>
+	using unique = std::unique_ptr<T>;
 
 	template<typename K, typename V>
 	using umap = std::unordered_map<K, V>;

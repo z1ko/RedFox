@@ -18,8 +18,8 @@ namespace RedFox
 			//Usa il backbuffer standard
 			void disable() const;
 
-		public:
-			Texture result;
+			//Usa la texture risultante nel contesto attuale
+			void bind() const;
 
 		private:
 			u32 m_handle, m_rbo, m_result;

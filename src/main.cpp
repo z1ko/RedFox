@@ -6,6 +6,7 @@
 #include "graphics/technique.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/transform.hpp"
+#include "graphics/shape.hpp"
 #include "graphics/renderer.hpp"
 
 using namespace RedFox;
@@ -20,7 +21,6 @@ Renderer renderer;
 class Sandbox : public Application
 {
 	RenderCommand command;
-
 	public:
 		void onInit()
 		{

@@ -8,6 +8,7 @@ namespace RedFox
 	}
 
 	Shape::Shape(const vector<Vertex>& _vertices, const vector<u32>& _indices)
+		: m_count(_indices.size())
 	{
 		glGenVertexArrays(1, &m_handle);
 		glBindVertexArray(m_handle);

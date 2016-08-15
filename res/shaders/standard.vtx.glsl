@@ -10,7 +10,7 @@ struct camera_t
     mat4 view;
     mat4 proj;
 };
-uniform camera_t camera;
+uniform camera_t   camera;
 
 struct instance_t
 {

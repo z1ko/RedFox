@@ -1,5 +1,7 @@
 #include "frame.hpp"
 
+#include "shape.hpp"
+
 namespace RedFox
 {
 	Frame::Frame()
@@ -19,7 +21,6 @@ namespace RedFox
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		result = Texture(m_handle);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glGenFramebuffers(1, &m_handle);
@@ -49,11 +50,23 @@ namespace RedFox
 	void Frame::enable() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_handle);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	//Usa il backbuffer standard
 	void Frame::disable() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glClear(GL_COLOR_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	//Usa la texture risultante nel contesto attuale
+	void Frame::bind() const
+	{
+		glBindTexture(GL_TEXTURE_2D, m_result);
 	}
 }

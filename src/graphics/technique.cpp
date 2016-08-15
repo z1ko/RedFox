@@ -1,6 +1,7 @@
 #include "technique.hpp"
 
 #include "../utils/io.hpp"
+#include "../utils/string.hpp"
 
 namespace RedFox
 {
@@ -15,9 +16,10 @@ namespace RedFox
 	{
 		m_handle = glCreateShader(_target);
 
-		const char* source = _source.c_str();
-		glShaderSource(m_handle, 1, &source, nullptr);
+		str resolvedSource = resolve(_source);
+		const char* source = resolvedSource.c_str();
 
+		glShaderSource(m_handle, 1, &source, nullptr);
 		glCompileShader(m_handle);
 
 		int status;
@@ -31,9 +33,32 @@ namespace RedFox
 	}
 
 	//Risolve #include
-	void Shader::resolve(str& _source)
+	str Shader::resolve(const str& _source)
 	{
+		//stringstream stream;
 
+		//vector<str> lines = SplitLines(_source);
+		//for(u32 i = 0; i < lines.size(); i++)
+		//{
+		//	//Se è una direttiva
+		//	if(lines[i][0] == '#')
+		//	{
+		//		str directive = lines[i].substr(1, lines[i].find_first_of(' ') - 1);
+		//		if(directive == "include")
+		//		{
+		//			str other = lines[i].substr(lines[i].find_first_of('"') + 1, lines[i].find_last_of('"'));
+		//			str source = ReadFileText("C:/Development/RedFox/RedFox/res/shaders/" + other.substr(0, other.size() - 1));
+
+		//			stream << source.substr(0, source.size() - 2);
+		//		}
+		//		if(directive == "version")
+		//			stream << lines[i] << '\n';
+		//	}
+		//	else stream << lines[i];
+		//}
+
+		//return stream.str();
+		return _source;
 	}
 
 	//=====================================================================================================================================
@@ -94,6 +119,11 @@ namespace RedFox
 	}
 
 	template<>
+	void Technique::setUniform<u32>(const str& _name, const u32& _value) {
+		glUniform1i(location(_name), _value);
+	}
+
+	template<>
 	void Technique::setUniform<vec3>(const str& _name, const vec3& _value) {
 		glUniform3f(location(_name), _value.x, _value.y, _value.z);
 	}
@@ -134,5 +164,8 @@ namespace RedFox
 		Shader frg(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/final.frg.glsl"), GL_FRAGMENT_SHADER);
 
 		initialize(vtx, frg);
+
+		//Setta slot per la texture generata dal frame
+		setUniform("frame", 0u);
 	}
 }

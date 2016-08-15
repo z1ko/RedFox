@@ -1,17 +1,16 @@
 #version 330 core
 
+//Output dello shader precedente per questo shader
 struct pixel_t
 {
-	vec2 uv;
-};
+    vec2 uv;
+}; 
 in pixel_t pixel;
 
-uniform sampler2D albedo;
+uniform sampler2D frame;
 
-//Colore finale del pixel
-out vec4 color;
-
+out vec4 final_color;
 void main()
 {
-    color = texture(albedo, pixel.uv);
+    final_color = texture(frame, pixel.uv);
 }

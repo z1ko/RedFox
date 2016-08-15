@@ -4,5 +4,5 @@
 
 namespace RedFox
 {
-	vector<str> split(const str& _text, char _delim);
+	vector<str> SplitLines(const str& _text);
 }

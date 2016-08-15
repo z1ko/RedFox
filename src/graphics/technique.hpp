@@ -21,7 +21,7 @@ namespace RedFox
 
 		private:
 			//Risolve #include
-			void resolve(str& _source);
+			str resolve(const str& _source);
 
 		private:
 			u32 m_handle;
