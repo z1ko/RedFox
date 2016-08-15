@@ -1,5 +1,6 @@
 #pragma once
 
+#include "frame.hpp"
 #include "technique.hpp"
 
 namespace RedFox
@@ -7,19 +8,12 @@ namespace RedFox
 	class PostProcess
 	{
 		public:
-			virtual void enable() const = 0;
-	};
+			//Crea l'effetto usando un fragment shader
+			PostProcess(const str& _filename);
 
-	class PostProcessChain
-	{
-		public:
-			//Esegue tutti gli effetti
-			void execute();
+			void enable() const;
 
-		private:
-			u32 m_current; //Frame corrente
-			Frame m_frames[2];
-
-			vector<unique<PostProcess>> m_postProcesses;
+		protected:
+			Technique m_technique;
 	};
 };

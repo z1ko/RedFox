@@ -31,6 +31,8 @@ class Sandbox : public Application
 
 			camera = Camera(glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.1f, 100.0f));
 			camera.position = vec3(0, 7, 14);
+
+			renderer.setPostProcess(new PostProcess("C:/Development/RedFox/RedFox/res/shaders/effects/sharpen.frg.glsl"));
 		}
 
 		void onUpdate()

@@ -39,6 +39,9 @@ namespace RedFox
 			//Tecnica nulla
 			Technique();
 
+			//Crea tecnica
+			void initialize(const Shader& _vtx, const Shader& _frg);
+
 			//Usa questa tecnica di rendering
 			void enable() const;
 
@@ -49,11 +52,7 @@ namespace RedFox
 
 			void setCamera(const Camera& _camera);
 			void setTransform(const Transform& _transform);
-
-		protected:
-			//Crea tecnica
-			void initialize(const Shader& _vtx, const Shader& _frg);
-
+			
 			u32 location(const str& _name);
 
 		protected:

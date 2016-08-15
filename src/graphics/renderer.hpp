@@ -31,8 +31,8 @@ namespace RedFox
 			Renderer();
 
 			//Aggiunge un post process
-			//TODO: Permetti di usare diversi stack di tecniche
-			void pushPostProcess(PostProcess* _process);
+			//TODO: Permetti di usare diverse stack di tecniche
+			void setPostProcess(PostProcess* _process);
 
 			//Aggiunge un commando che verrà eseguito all'invocazione di flush
 			void submitCommand(u32 _technique, u32 _material, u32 _model, Transform* _transform);
@@ -44,6 +44,6 @@ namespace RedFox
 
 		private:
 			vector<RenderCommand> m_commands;
-			vector<unique<PostProcess>> m_postProcesses;
+			unique<PostProcess> m_postProcess;
 	};
 }

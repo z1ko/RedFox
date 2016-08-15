@@ -27,10 +27,10 @@ namespace RedFox
 	}
 
 	//Aggiunge un post process
-	//TODO: Permetti di usare diversi stack di tecniche
-	void Renderer::pushPostProcess(PostProcess* _process)
+	//TODO: Permetti di usare diverse stack di tecniche
+	void Renderer::setPostProcess(PostProcess* _process)
 	{
-		m_postProcesses.emplace_back(_process);
+		m_postProcess.reset(_process);
 	}
 
 	//Aggiunge un commando che verrà eseguito all'invocazione di flush
@@ -101,16 +101,30 @@ namespace RedFox
 		static const Shape screen = Shape::Screen();
 
 		//Esegue tutti gli effetti post produzione
-		for (const auto& process : m_postProcesses)
+		static Frame postProcessFrame(1600, 900);
+
+		if(m_postProcess)
 		{
-			process->enable();
+			postProcessFrame.enable();
+			{
+				m_postProcess->enable();
+				renderingFrame.bind();
+				screen.render();
+			}
+			postProcessFrame.disable();
+
+			//Renderizza frame finale
+			finalTechnique.enable();
+			postProcessFrame.bind();
 			screen.render();
 		}
-
-		//Renderizza frame finale
-		finalTechnique.enable();
-		renderingFrame.bind();
-		screen.render();
+		else
+		{
+			//Renderizza frame finale
+			finalTechnique.enable();
+			renderingFrame.bind();
+			screen.render();
+		}
 
 		//Resetta shader altrimenti può capitare che la scena venga renderizzata con la tecnica finale
 		lastTechnique = nullptr;
