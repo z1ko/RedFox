@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../core/events.hpp"
 #include "../resources/database.hpp"
 
 #include "../graphics/window.hpp"

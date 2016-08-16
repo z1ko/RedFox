@@ -38,7 +38,7 @@ class Sandbox : public Application
 			camera.position = vec3(0, 7, 14);
 
 			//renderer.setPostProcess(new PostProcess("C:/Development/RedFox/RedFox/res/shaders/effects/sharpen.frg.glsl"));
-			renderer.setSkyBox(new CubeMap(textures));
+			//renderer.setSkyBox(new CubeMap(textures));
 		}
 
 		void onUpdate()

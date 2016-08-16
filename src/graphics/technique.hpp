@@ -39,11 +39,22 @@ namespace RedFox
 			//Tecnica nulla
 			Technique();
 
-			//Crea tecnica
-			void initialize(const Shader& _vtx, const Shader& _frg);
-
 			//Usa questa tecnica di rendering
 			void enable() const;
+
+			//Crea handle per la tecnica
+			//Inizia catena di costruzione
+			Technique& initialize();
+
+			//Aggiunge uno shader alla pipeline temporanea
+			Technique& attach(const Shader& _shader);
+
+			//Toglie uno shader dalla pipeline temporanea
+			Technique& detach(const Shader& _shader);
+
+			//Finalizza la tecnica usnado la pipeline temporanea
+			//Termina catena di costruzione
+			void link();
 
 			template<typename T>
 			void setUniform(const str& _name, const T& _value);

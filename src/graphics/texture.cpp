@@ -18,7 +18,7 @@ namespace RedFox
 		u32 mode = (ext == "png") ? SOIL_LOAD_RGBA : SOIL_LOAD_RGB;
 
 		int width, height;
-		u8* image = SOIL_load_image(_filename.c_str(), &width, &height, 0, mode);
+		u8* image = SOIL_load_image(_filename.c_str(), &width, &height, 0, SOIL_LOAD_AUTO);
 
 		glGenTextures(1, &m_handle);
 		glBindTexture(GL_TEXTURE_2D, m_handle);

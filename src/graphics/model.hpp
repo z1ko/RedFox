@@ -96,7 +96,7 @@ namespace RedFox
 			Material m_material;
 	};
 
-	class Model : public Component
+	class Model
 	{
 		public:
 			Model();
@@ -104,7 +104,7 @@ namespace RedFox
 			Model(const str& _filename);
 
 			//Renderizza tutte le mesh
-			void render() override;
+			void render();
 
 		private:
 			vector<Mesh> m_meshes;

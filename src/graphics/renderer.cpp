@@ -4,7 +4,10 @@
 
 namespace RedFox
 {
+	//===============================================================================================================
+
 	RenderCommand::RenderCommand() 
+		: technique(0), material(0), model(0), transform(nullptr)
 	{
 	}
 

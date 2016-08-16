@@ -1,5 +1,7 @@
 #include "window.hpp"
 
+#include "../core/events.hpp"
+
 namespace RedFox
 {
 	Window::Window(const str& _title, u32 _width, u32 _height)
@@ -11,6 +13,9 @@ namespace RedFox
 		glfwMakeContextCurrent(m_handle);
 
 		//glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		//Callbacks per l'input
+		glfwSetKeyCallback(m_handle, keyCallback);
 
 		//Carica estensioni opengl
 		glewInit();
@@ -31,5 +36,26 @@ namespace RedFox
 		glfwPollEvents();
 
 		return !glfwWindowShouldClose(m_handle);
+	}
+
+	void Window::keyCallback(GLFWwindow* _handle, int _key, int _scancode, int _action, int _mods)
+	{
+		switch (_action)
+		{
+			case GLFW_PRESS:
+				Events::Input::KeyDown((u32)_key);
+				break;
+			case GLFW_RELEASE:
+				Events::Input::KeyUp((u32)_key);
+				break;
+		}
+	}
+
+	void Window::mouseMovementCallback(GLFWwindow* _handle, double _X, double _y)
+	{
+	}
+
+	void Window::mouseButtonsCallback(GLFWwindow* _handle, int _button, int _action, int _mods)
+	{
 	}
 }

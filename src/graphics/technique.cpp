@@ -69,14 +69,30 @@ namespace RedFox
 	{
 	}
 
-	//Crea tecnica dalle source degli shader
-	void Technique::initialize(const Shader& _vtx, const Shader& _frg)
+	//Crea handle per la tecnica
+	Technique& Technique::initialize()
 	{
 		m_handle = glCreateProgram();
+		return *this;
+	}
 
-		glAttachShader(m_handle, _vtx.m_handle);
-		glAttachShader(m_handle, _frg.m_handle);
+	//Aggiunge uno shader alla pipeline temporanea
+	Technique& Technique::attach(const Shader& _shader)
+	{
+		glAttachShader(m_handle, _shader.m_handle);
+		return *this;
+	}
 
+	//Toglie uno shader dalla pipeline temporanea
+	Technique& Technique::detach(const Shader& _shader)
+	{
+		glDetachShader(m_handle, _shader.m_handle);
+		return *this;
+	}
+
+	//Finalizza la tecnica usando la pipeline temporanea
+	void Technique::link()
+	{
 		glLinkProgram(m_handle);
 
 		int status;
@@ -87,9 +103,6 @@ namespace RedFox
 			glGetProgramInfoLog(m_handle, 256, nullptr, log);
 			RFX_ERROR("Creazione programma fallita");
 		}
-
-		glDetachShader(m_handle, _frg.m_handle);
-		glDetachShader(m_handle, _frg.m_handle);
 	}
 
 	//Usa questa tecnica di rendering
@@ -153,7 +166,7 @@ namespace RedFox
 		Shader vtx(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/standard.vtx.glsl"), GL_VERTEX_SHADER);
 		Shader frg(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/standard.frg.glsl"), GL_FRAGMENT_SHADER);
 
-		initialize(vtx, frg);
+		initialize().attach(vtx).attach(frg).link();
 	}
 
 	//=====================================================================================================================================
@@ -163,7 +176,7 @@ namespace RedFox
 		Shader vtx(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/final.vtx.glsl"), GL_VERTEX_SHADER);
 		Shader frg(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/final.frg.glsl"), GL_FRAGMENT_SHADER);
 
-		initialize(vtx, frg);
+		initialize().attach(vtx).attach(frg).link();
 	}
 
 	//=====================================================================================================================================
@@ -173,6 +186,6 @@ namespace RedFox
 		Shader vtx(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/skybox.vtx.glsl"), GL_VERTEX_SHADER);
 		Shader frg(RedFox::ReadFileText("C:/Development/RedFox/RedFox/res/shaders/skybox.frg.glsl"), GL_FRAGMENT_SHADER);
 
-		initialize(vtx, frg);
+		initialize().attach(vtx).attach(frg).link();
 	}
 }

@@ -4,22 +4,6 @@
 
 namespace RedFox
 {
-	//Preset per opengl
-	class Preset
-	{
-		public:
-			virtual void use() const = 0;
-	};
-
-	class StandardPreset
-	{
-	};
-
-	class WirePreset
-	{
-	};
-
-	//=======================================================================================
 
 	class Window
 	{
@@ -31,6 +15,11 @@ namespace RedFox
 		private:
 			//Ottiene input utente e swappa buffers
 			bool update();
+
+		private:
+			static void keyCallback(GLFWwindow* _handle, int _key, int _scancode, int _action, int _mods);
+			static void mouseMovementCallback(GLFWwindow* _handle, double _X, double _y);
+			static void mouseButtonsCallback(GLFWwindow* _handle, int _button, int _action, int _mods);
 
 		private:
 			GLFWwindow* m_handle;
