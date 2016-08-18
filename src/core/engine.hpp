@@ -2,12 +2,20 @@
 
 #include "../common.hpp"
 #include "../core/events.hpp"
-#include "../resources/database.hpp"
+#include "../resources/resources.hpp"
 
 #include "../graphics/window.hpp"
 
 namespace RedFox
 {
+	namespace Globals
+	{
+		namespace Directories
+		{
+			extern str Executable, Models, Shaders, Textures;
+		};
+	};
+
 	class Application
 	{
 		public:

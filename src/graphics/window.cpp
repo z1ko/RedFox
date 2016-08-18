@@ -12,10 +12,12 @@ namespace RedFox
 		m_handle = glfwCreateWindow(_width, _height, _title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_handle);
 
-		//glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetWindowPos(m_handle, 50, 50);
+		glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		//Callbacks per l'input
 		glfwSetKeyCallback(m_handle, keyCallback);
+		glfwSetCursorPosCallback(m_handle, mouseMovementCallback);
 
 		//Carica estensioni opengl
 		glewInit();
@@ -33,29 +35,28 @@ namespace RedFox
 	bool Window::update()
 	{
 		glfwSwapBuffers(m_handle);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		glfwPollEvents();
+
+		//Resetta posizione mouse
+		glfwSetCursorPos(m_handle, 0, 0);
 
 		return !glfwWindowShouldClose(m_handle);
 	}
 
 	void Window::keyCallback(GLFWwindow* _handle, int _key, int _scancode, int _action, int _mods)
 	{
-		switch (_action)
-		{
-			case GLFW_PRESS:
-				Events::Input::KeyDown((u32)_key);
-				break;
-			case GLFW_RELEASE:
-				Events::Input::KeyUp((u32)_key);
-				break;
-		}
+		Events::Input::KeyAction(_key, _action);
 	}
 
-	void Window::mouseMovementCallback(GLFWwindow* _handle, double _X, double _y)
+	void Window::mouseMovementCallback(GLFWwindow* _handle, double _x, double _y)
 	{
+		Events::Input::MouseMove(_x, _y);
 	}
 
 	void Window::mouseButtonsCallback(GLFWwindow* _handle, int _button, int _action, int _mods)
 	{
+		 Events::Input::BtnAction(_button, _action);
 	}
 }

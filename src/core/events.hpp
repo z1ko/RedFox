@@ -81,7 +81,9 @@ namespace RedFox
 	{
 		namespace Input
 		{
-			extern Event<u32> KeyDown, KeyUp;
+			extern Event<u32, u32> KeyAction;
+			extern Event<u32, u32> BtnAction;
+			extern Event<f64, f64> MouseMove;
 		}
 	}
 }

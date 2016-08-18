@@ -2,7 +2,6 @@
 
 namespace RedFox
 {
-
 	Material::Material()
 	{
 	}
@@ -95,7 +94,6 @@ namespace RedFox
 
 	//Renderizza mesh
 	void Mesh::render() const
-
 	{
 		//Setta materiale
 		m_material.albedo.bind(0);

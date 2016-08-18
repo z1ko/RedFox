@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
-#include "../resources/database.hpp"
+#include "../resources/resources.hpp"
 
 #include "../graphics/frame.hpp"
 #include "../graphics/model.hpp"
@@ -15,16 +15,19 @@ namespace RedFox
 	{
 		public:
 			//TODO(?): Sposta il transform
-			RenderCommand(u32 _technique, u32 _material, u32 _model, Transform* _transform);
+			RenderCommand(Key<Technique> _technique, Key<Material> _material, Key<Model> _model, Transform* _transform);
 			RenderCommand();
 
 			//Permette di organizzare i comandi in modo da limitare gli switch nel contesto
 			bool operator <(const RenderCommand& _other) const;
 
 		public:
-			u32 technique, material, model;
-			Transform* transform;
-	};
+			 Key<Technique> technique;
+			 Key<Material> material;
+			 Key<Model> model;
+
+			 Transform* transform;
+	}; 
 
 	class Renderer
 	{
@@ -39,7 +42,7 @@ namespace RedFox
 			void setSkyBox(CubeMap* _cubeMap);
 
 			//Aggiunge un commando che verrà eseguito all'invocazione di flush
-			void submitCommand(u32 _technique, u32 _material, u32 _model, Transform* _transform);
+			void submitCommand(Key<Technique> _technique, Key<Material> _material, Key<Model> _model, Transform* _transform);
 			void submitCommand(const RenderCommand& _command);
 
 			//Sorta ed esegue tutti i comandi

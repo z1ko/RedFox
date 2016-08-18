@@ -17,7 +17,7 @@ namespace RedFox
 			Shader();
 
 			//Crea shader da source
-			Shader(const str& _source, u32 _target);
+			Shader(const str& _filename, u32 _target);
 
 		private:
 			//Risolve #include

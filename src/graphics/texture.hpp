@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../memory/pool.hpp"
 
 namespace RedFox
 {

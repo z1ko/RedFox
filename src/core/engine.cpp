@@ -2,11 +2,24 @@
 
 namespace RedFox
 {
+	namespace Globals
+	{
+		namespace Directories
+		{
+			str Executable, Models, Shaders, Textures;
+		};
+	};
+
 	//Punto di ingresso
 	void Engine::initialize(int _argc, char** _argv)
 	{
 		//Crea finestringinga
-		m_window = new Window("RedFox Engine", 1660, 900);
+		m_window = new Window("RedFox Engine", 1600, 900);
+
+		//Setta percorsi
+		Globals::Directories::Textures = "C:/Development/RedFox/RedFox/res/textures/";
+		Globals::Directories::Shaders = "C:/Development/RedFox/RedFox/res/shaders/";
+		Globals::Directories::Models = "C:/Development/RedFox/RedFox/res/models/";
 
 		//TODO: Crea sistemi
 	}

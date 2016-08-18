@@ -7,12 +7,12 @@ namespace RedFox
 	//===============================================================================================================
 
 	RenderCommand::RenderCommand() 
-		: technique(0), material(0), model(0), transform(nullptr)
+		: transform(nullptr)
 	{
 	}
 
 	//TODO(?): Sposta il transform
-	RenderCommand::RenderCommand(u32 _technique, u32 _material, u32 _model, Transform* _transform)
+	RenderCommand::RenderCommand(Key<Technique> _technique, Key<Material> _material, Key<Model> _model, Transform* _transform)
 		: technique(_technique), material(_material), model(_model), transform(_transform)
 	{
 	}
@@ -20,7 +20,7 @@ namespace RedFox
 	//Permette di organizzare i comandi in modo da limitare gli switch nel contesto
 	bool RenderCommand::operator < (const RenderCommand& _other) const
 	{
-		return (technique < _other.technique || material < _other.material || model < _other.model);
+		return (technique.index < _other.technique.index || material.index < _other.material.index || model.index < _other.model.index);
 	}
 
 	//===============================================================================================================
@@ -43,7 +43,7 @@ namespace RedFox
 	}
 
 	//Aggiunge un commando che verrà eseguito all'invocazione di flush
-	void Renderer::submitCommand(u32 _technique, u32 _material, u32 _model, Transform* _transform)
+	void Renderer::submitCommand(Key<Technique> _technique, Key<Material> _material, Key<Model> _model, Transform* _transform)
 	{
 		//TODO(?): Usa batches 
 		m_commands.emplace_back(_technique, _material, _model, _transform);
@@ -58,7 +58,7 @@ namespace RedFox
 	void Renderer::renderSkyBox(const Camera& _camera)
 	{
 		static SkyBoxTechnique technique;
-		static Shape quad = Shape::Quad();
+		static Shape quad = Shape::Cube();
 
 		//Toglie la traslazione dalla matrice della telecamera
 		mat4 view = mat4(mat3(_camera.view()));
@@ -96,11 +96,11 @@ namespace RedFox
 		for(const auto& command : m_commands)
 		{
 			//Cambia la tecnica solo se necessario
-			static u32 lastTechniqueIndex = UINT_MAX;
-			if (command.technique != lastTechniqueIndex || lastTechnique == nullptr)
+			static Key<Technique> lastTechniqueIndex;
+			if (command.technique.index != lastTechniqueIndex.index || lastTechnique == nullptr)
 			{
 				//Trova tecnica usando l'index specificato nel comando
-				lastTechnique = Database::retrive<Technique>(command.technique);
+				lastTechnique = Resources::retrive<Technique>(command.technique);
 				lastTechnique->enable();
 
 				//Setta camera
@@ -126,7 +126,7 @@ namespace RedFox
 			lastTechnique->setTransform(*command.transform);
 
 			//Trova modello usando l'index specificato nel comando
-			Model* model = Database::retrive<Model>(command.model);
+			Model* model = Resources::retrive<Model>(command.model);
 			model->render();
 		}
 		renderingFrame.disable();

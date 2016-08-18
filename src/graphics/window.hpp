@@ -18,7 +18,7 @@ namespace RedFox
 
 		private:
 			static void keyCallback(GLFWwindow* _handle, int _key, int _scancode, int _action, int _mods);
-			static void mouseMovementCallback(GLFWwindow* _handle, double _X, double _y);
+			static void mouseMovementCallback(GLFWwindow* _handle, double _x, double _y);
 			static void mouseButtonsCallback(GLFWwindow* _handle, int _button, int _action, int _mods);
 
 		private:

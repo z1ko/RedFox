@@ -13,11 +13,15 @@ struct pixel_t
 };
 in pixel_t pixel;
 
-uniform sampler2D albedo;
+struct material_t
+{
+	sampler2D albedo;
+};
+uniform material_t material;
 
 void main()
 {
     position = pixel.position;
     normal = normalize(pixel.normal);
-    color = texture(albedo, pixel.uv);
+    color = texture(material.albedo, pixel.uv).xyz;
 }

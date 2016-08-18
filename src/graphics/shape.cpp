@@ -57,7 +57,7 @@ namespace RedFox
 		return Shape(vertices, indices);
 	}
 
-	Shape Shape::Quad()
+	Shape Shape::Cube()
 	{
 		static const vector<Vertex> vertices =
 		{

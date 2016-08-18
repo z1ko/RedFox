@@ -2,6 +2,7 @@
 
 #include "../utils/io.hpp"
 #include "../utils/string.hpp"
+#include "../core/engine.hpp"
 
 namespace RedFox
 {
@@ -12,11 +13,14 @@ namespace RedFox
 	}
 
 	//Crea shader da source
-	Shader::Shader(const str& _source, u32 _target)
+	Shader::Shader(const str& _filename, u32 _target)
 	{
 		m_handle = glCreateShader(_target);
 
-		str resolvedSource = resolve(_source);
+		str path = Globals::Directories::Shaders + _filename;
+		str text = ReadFileText(path);
+
+		str resolvedSource = resolve(text);
 		const char* source = resolvedSource.c_str();
 
 		glShaderSource(m_handle, 1, &source, nullptr);
@@ -142,6 +146,11 @@ namespace RedFox
 	}
 
 	template<>
+	void Technique::setUniform<mat3>(const str& _name, const mat3& _value) {
+		 glUniformMatrix3fv(location(_name), 1, GL_FALSE, glm::value_ptr(_value));
+	}
+
+	template<>
 	void Technique::setUniform<mat4>(const str& _name, const mat4& _value) {
 		glUniformMatrix4fv(location(_name), 1, GL_FALSE, glm::value_ptr(_value));
 	}
@@ -156,7 +165,11 @@ namespace RedFox
 
 	void Technique::setTransform(const Transform& _transform)
 	{
-		setUniform("instance.model", _transform.model());
+		mat4 model = _transform.model();
+		setUniform("instance.model", model);
+
+		mat3 normalizer = glm::transpose(glm::inverse(mat3(model)));
+		setUniform("instance.normalizer", normalizer);
 	}
 
 	//=====================================================================================================================================

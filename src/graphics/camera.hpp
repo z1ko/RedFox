@@ -11,24 +11,26 @@ namespace RedFox
 			Camera(const mat4 _projection);
 			virtual ~Camera();
 
-			//Aggiorna posizione e rotazione camera
-			void update();
-
 			mat4 view() const;
 			inline mat4 proj() const { return m_proj; }
 
+			vec3 up() const;
+			vec3 right() const;
+			vec3 forward() const;
+
+		private:
+			mat4 orientation() const;
+
 		private:
 			//Eventi
-			void onKeyDown(u32 _key);
-			void onKeyUp(u32 _key);
+			void onMouseMove(f64 _x, f64 _y);
+			void onKeyAction(u32 _key, u32 _action);
 
 		public:
 			vec3 position;
-
-		private:
-			float pitch;
-			float distance;
-			float angle;
+		
+			float m_upAngle;
+			float m_rightAngle;
 
 		private:
 			mat4 m_proj;

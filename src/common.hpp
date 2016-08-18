@@ -29,14 +29,22 @@
 //Caricamento immagini
 #include "../ext/soil/include/SOIL.h"
 
+#define RFX_MESSAGE(text)\
+printf("[RFX][MSG]: %s\n", text)
+
 #define RFX_WARNING(text)\
-printf("[WRN]: %s", text)
+printf("[RFX][WRN]: %s\n", text)
 
 #define RFX_ERROR(text)\
-printf("[ERR]: %s", text)
+printf("[RFX][ERR]: %s\n", text)
+
+#define RFX_POOL_CAPACITY 256
 
 namespace RedFox
 {
+	using f64 = double;
+	using f32 = float;
+
 	using u32 = unsigned int;
 	using i32 = int;
 
