@@ -19,6 +19,15 @@ struct material_t
 };
 uniform material_t material;
 
+const float far  = 100.0;
+const float near = 0.1;
+
+float linearize_depth(float _depth)
+{
+    float z = _depth * 2.0 - 1.0;
+    return (2.0 * near * far) / (far + near - z * (far - near));
+}
+
 void main()
 {
     position = pixel.position;

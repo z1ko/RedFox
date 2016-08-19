@@ -22,7 +22,7 @@ namespace RedFox
 		//Carica estensioni opengl
 		glewInit();
 
-		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glViewport(0, 0, _width, _height);
 
 		glEnable(GL_CULL_FACE);

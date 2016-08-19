@@ -1,127 +1,275 @@
 #include "model.hpp"
 
+#include "../core/engine.hpp"
+
 namespace RedFox
 {
-	Material::Material()
-	{
-	}
+	 Material::Material()
+	 {
+	 }
 
-	//Carica materiale con assimp
-	Material::Material(const aiMaterial* _material)
-	{
-		//Carica albedo
-		if(_material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
-		{
-			aiString tmpName;
-			_material->GetTexture(aiTextureType_DIFFUSE, 0, &tmpName, NULL, NULL, NULL, NULL, NULL);
+	 Material::Material(const aiMaterial* _material)
+	 {
+		  if (_material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+		  {
+				aiString textureName;
+				_material->GetTexture(aiTextureType_DIFFUSE, 0, &textureName, NULL, NULL, NULL, NULL, NULL);
+				m_diffuse = Texture::load(textureName.C_Str(), GL_TEXTURE_2D);
+		  }
+		  else
+		  {
+				RFX_ERROR("Il materiale non ha una texture diffusiva");
+		  }
+	 }
 
-			str name = tmpName.C_Str();
-			u32 last = name.find_last_of('\\') + 1;
-			if(last != 0)
-				name = name.substr(last);
+	 void Material::dispose()
+	 {
+	 }
 
-			albedo = Texture("C:/Development/RedFox/RedFox/res/textures/" + name);
-		}
-	}
+	 Material& Material::operator = (const Material& _other)
+	 {
+		  if (this != &_other)
+		  {
+				m_diffuse = _other.m_diffuse;
+		  }
+		  return *this;
+	 }
 
-	//=====================================================================================================================================
+	 //Binda le textures nello shader corrente
+	 void Material::enable() const
+	 {
+		  m_diffuse.bind(0);
+	 }
 
-	Mesh::Mesh()
-	{
-	}
+	 //==========================================================================================================
 
-	//Crea mesh tramite assimp
-	Mesh::Mesh(const aiScene* _scene, const aiMesh* _mesh)
-	{
-		glGenVertexArrays(1, &m_vao);
-		glBindVertexArray(m_vao);
+	 Shape::Shape()
+	 {
+	 }
 
-		vector<Vertex> vertices(_mesh->mNumVertices);
+	 Shape::Shape(const aiMesh* _mesh)
+	 {
+		  glGenVertexArrays(1, &m_vao);
+		  glBindVertexArray(m_vao);
 
-		for(u32 i = 0; i < _mesh->mNumVertices; i++)
-		{
-			//Posizione
-			vertices[i].position.x = _mesh->mVertices[i].x;
-			vertices[i].position.y = _mesh->mVertices[i].y;
-			vertices[i].position.z = _mesh->mVertices[i].z;
+		  vector<Vertex> vertices(_mesh->mNumVertices);
 
-			
-			//Normale
-			vertices[i].normal.x = _mesh->mNormals[i].x;
-			vertices[i].normal.y = _mesh->mNormals[i].y;
-			vertices[i].normal.z = _mesh->mNormals[i].z;
+		  for (u32 i = 0; i < _mesh->mNumVertices; i++)
+		  {
+				//Posizione
+				vertices[i].position.x = _mesh->mVertices[i].x;
+				vertices[i].position.y = _mesh->mVertices[i].y;
+				vertices[i].position.z = _mesh->mVertices[i].z;
 
-			//TexUV
-			if (_mesh->mTextureCoords[0])
-			{
-				vertices[i].uv.x = _mesh->mTextureCoords[0][i].x;
-				vertices[i].uv.y = _mesh->mTextureCoords[0][i].y;
-			}
-		}
 
-		glGenBuffers(1, &m_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+				//Normale
+				vertices[i].normal.x = _mesh->mNormals[i].x;
+				vertices[i].normal.y = _mesh->mNormals[i].y;
+				vertices[i].normal.z = _mesh->mNormals[i].z;
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+				//TexUV
+				if (_mesh->mTextureCoords[0])
+				{
+					 vertices[i].uv.x = _mesh->mTextureCoords[0][i].x;
+					 vertices[i].uv.y = _mesh->mTextureCoords[0][i].y;
+				}
+				else RFX_WARNING("La mesh non contiene cordinate UV");
+		  }
 
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+		  glGenBuffers(1, &m_vbo);
+		  glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+		  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+		  glEnableVertexAttribArray(0);
+		  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
-		m_count = _mesh->mNumFaces * 3;
-		vector<u32> indices(m_count);
+		  glEnableVertexAttribArray(1);
+		  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-		for(u32 i = 0; i < _mesh->mNumFaces; i++)
-		{
-			indices[i * 3 + 0] = _mesh->mFaces[i].mIndices[0];
-			indices[i * 3 + 1] = _mesh->mFaces[i].mIndices[1];
-			indices[i * 3 + 2] = _mesh->mFaces[i].mIndices[2];
-		}
+		  glEnableVertexAttribArray(2);
+		  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
-		glGenBuffers(1, &m_ebo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u32) * indices.size(), indices.data(), GL_STATIC_DRAW);
+		  m_count = _mesh->mNumFaces * 3;
+		  vector<u32> indices(m_count);
 
-		glBindVertexArray(0);
+		  for (u32 i = 0; i < _mesh->mNumFaces; i++)
+		  {
+				indices[i * 3 + 0] = _mesh->mFaces[i].mIndices[0];
+				indices[i * 3 + 1] = _mesh->mFaces[i].mIndices[1];
+				indices[i * 3 + 2] = _mesh->mFaces[i].mIndices[2];
+		  }
 
-		//Carica materiale
-		m_material = Material(_scene->mMaterials[_mesh->mMaterialIndex]);
-	}
+		  glGenBuffers(1, &m_ebo);
+		  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+		  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u32) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
-	//Renderizza mesh
-	void Mesh::render() const
-	{
-		//Setta materiale
-		m_material.albedo.bind(0);
+		  glBindVertexArray(0);
+	 }
 
-		glBindVertexArray(m_vao);
-		glDrawElements(GL_TRIANGLES, m_count, GL_UNSIGNED_INT, nullptr);
-	}
+	 Shape::Shape(const vector<Vertex>& _vertices, const vector<u32>& _indices)
+		  : m_count(_indices.size())
+	 {
+		  glGenVertexArrays(1, &m_vao);
+		  glBindVertexArray(m_vao);
 
-	//=====================================================================================================================================
+		  glGenBuffers(1, &m_vbo);
+		  glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+		  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * _vertices.size(), _vertices.data(), GL_STATIC_DRAW);
 
-	Model::Model()
-	{
-	}
+		  glEnableVertexAttribArray(0);
+		  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
-	//Carica mesh da file
-	Model::Model(const str& _filename)
-	{
-		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(_filename, aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+		  glEnableVertexAttribArray(1);
+		  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-		//Carica tutte le mesh nella scena
-		for (u32 i = 0; i < scene->mNumMeshes; i++)
-			m_meshes.emplace_back(scene, scene->mMeshes[i]);
-	}
+		  glEnableVertexAttribArray(2);
+		  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
-	void Model::render()
-	{
-		for (const auto& mesh : m_meshes)
-			mesh.render();
-	}
+		  glGenBuffers(1, &m_ebo);
+		  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+		  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u32) * _indices.size(), _indices.data(), GL_STATIC_DRAW);
+
+		  glBindVertexArray(0);
+	 }
+
+	 void Shape::dispose()
+	 {
+		  glDeleteVertexArrays(1, &m_vao);
+
+		  glDeleteBuffers(1, &m_vbo);
+		  glDeleteBuffers(1, &m_ebo);
+	 }
+
+	 Shape& Shape::operator = (const Shape& _other)
+	 {
+		  if (this != &_other)
+		  {
+				m_vao = _other.m_vao;
+				m_vbo = _other.m_vbo;
+				m_ebo = _other.m_ebo;
+
+				m_count = _other.m_count;
+		  }
+		  return *this;
+	 }
+
+	 //Renderizza la forma
+	 void Shape::render() const
+	 {
+		  glBindVertexArray(m_vao);
+		  glDrawElements(GL_TRIANGLES, m_count, GL_UNSIGNED_INT, nullptr);
+	 }
+
+	 Shape Shape::Screen()
+	 {
+		  static const vector<Vertex> vertices =
+		  {
+				{ {  1.0f,  1.0f, 0.0f },{ 0.0f, 0.0f, 0.0f },{ 1.0f, 1.0f } },
+				{ { -1.0f,  1.0f, 0.0f },{ 0.0f, 0.0f, 0.0f },{ 0.0f, 1.0f } },
+				{ { -1.0f, -1.0f, 0.0f },{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },
+				{ {  1.0f, -1.0f, 0.0f },{ 0.0f, 0.0f, 0.0f },{ 1.0f, 0.0f } }
+		  };
+		  static const vector<u32> indices =
+		  {
+				0,1,2, 2,3,0
+		  };
+
+		  return Shape(vertices, indices);
+	 }
+
+	 Shape Shape::Cube()
+	 {
+		  static const vector<Vertex> vertices =
+		  {
+				{ { -1.0f, -1.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+				{ { -1.0f, -1.0f,  1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+				{ { -1.0f,  1.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+				{ { -1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+				{ {  1.0f, -1.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+				{ {  1.0f, -1.0f,  1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+				{ {  1.0f,  1.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+				{ {  1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } }
+		  };
+		  static const vector<u32> indices =
+		  {
+				0,6,4, 0,2,6, 0,3,2, 0,1,3, 2,7,6, 2,3,7, 4,6,7, 4,7,5, 0,4,5, 0,5,1, 1,5,7, 1,7,3
+		  };
+
+		  return Shape(vertices, indices);
+	 }
+
+	 //==========================================================================================================
+
+	 Mesh::Mesh()
+	 {
+	 }
+
+	 Mesh::Mesh(const aiMesh* _mesh, const aiMaterial* _material)
+		  : m_shape(_mesh), m_material(_material)
+	 {
+	 }
+
+	 void Mesh::dispose()
+	 {
+	 }
+
+	 Mesh& Mesh::operator = (const Mesh& _other)
+	 {
+		  if (this != &_other)
+		  {
+				m_shape = _other.m_shape;
+				m_material = _other.m_material;
+		  }
+		  return *this;
+	 }
+
+	 //Usa il materiale e renderizza la forma
+	 void Mesh::render() const
+	 {
+		  m_material.enable();
+		  m_shape.render();
+	 }
+
+	 //==========================================================================================================
+
+	 Model::Model()
+	 {
+	 }
+
+	 Model::Model(const str& _filename)
+	 {
+		  Assimp::Importer importer;
+
+		  str path = Globals::Directories::Models + _filename;
+		  const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+
+		  //Carica tutte le mesh
+		  for (u32 i = 0; i < scene->mNumMeshes; i++)
+		  {
+				const aiMesh* mesh = scene->mMeshes[i];
+				m_meshes.emplace_back(mesh, scene->mMaterials[mesh->mMaterialIndex]);
+		  }
+	 }
+
+	 void Model::dispose()
+	 {
+	 }
+
+	 Model& Model::operator = (const Model& _other)
+	 {
+		  if (this != &_other)
+		  {
+				m_meshes = _other.m_meshes;
+		  }
+		  return *this;
+	 }
+
+	 //Renderizza tutte le mesh
+	 void Model::render() const
+	 {
+		  for (const auto& mesh : m_meshes)
+				mesh.render();
+	 }
+
+	 //==========================================================================================================
 }

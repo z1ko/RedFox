@@ -14,7 +14,7 @@ namespace RedFox
 	void Engine::initialize(int _argc, char** _argv)
 	{
 		//Crea finestringinga
-		m_window = new Window("RedFox Engine", 1600, 900);
+		m_window = new Window("RedFox Engine", RFX_WINDOW_WIDTH, RFX_WINDOW_HEIGHT);
 
 		//Setta percorsi
 		Globals::Directories::Textures = "C:/Development/RedFox/RedFox/res/textures/";

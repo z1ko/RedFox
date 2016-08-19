@@ -8,7 +8,7 @@ namespace RedFox
 	class Singleton
 	{
 		public:
-			static T& get() noexcept
+			static T& instance() noexcept
 			{
 				static T instance;
 				return instance;

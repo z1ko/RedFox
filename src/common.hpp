@@ -27,7 +27,9 @@
 #include "../ext/assimp/include/postprocess.h"
 
 //Caricamento immagini
-#include "../ext/soil/include/SOIL.h"
+#include "../ext/freeimage/include/FreeImage.h"
+
+#define RFX_ASSERT(expr) assert(expr)
 
 #define RFX_MESSAGE(text)\
 printf("[RFX][MSG]: %s\n", text)
@@ -39,6 +41,9 @@ printf("[RFX][WRN]: %s\n", text)
 printf("[RFX][ERR]: %s\n", text)
 
 #define RFX_POOL_CAPACITY 256
+
+#define RFX_WINDOW_WIDTH  1600
+#define RFX_WINDOW_HEIGHT 900
 
 namespace RedFox
 {

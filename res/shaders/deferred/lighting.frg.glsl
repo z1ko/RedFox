@@ -41,16 +41,24 @@ void main()
     vec3 normal = texture(gbuffer.normal, pixel.uv).rgb;
 
     //Colore di base
-    final_color = vec4(albedo, 1.0) * 0.1;
+    final_color = vec4(albedo, 1.0) * 0.3;
 
     //Direzione frammento - camera
-    vec3 frg_dir = normalize(camera.position - position);
+    vec3 view_dir = normalize(camera.position - position);
 
     //Calcola contributo di ogni luce nel colore finale
     //TODO: Usa delle ottimizzazioni per la luce (Tiles)
     for(int i = 0; i < 64; i++)
     {
+        //Blinn-Phong
         vec3 light_dir = normalize(lights[i].position - position);
+        vec3 half = normalize(view_dir + light_dir);
+
+        //Colore diffusivo
         final_color += vec4(max(dot(normal, light_dir), 0.0) * albedo * lights[i].color, 1.0);
+        
+        //Colore speculare
+        float spec_color = pow(max(dot(normal, half), 0.0), 32);
+        final_color += vec4(0.5f * spec_color * lights[i].color, 1.0);
     }
 }

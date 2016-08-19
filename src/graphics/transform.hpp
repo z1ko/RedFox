@@ -15,6 +15,6 @@ namespace RedFox
 		public:
 			vec3 scale;
 			vec3 position;
-			vec3 orientation;
+			vec3 rotation;
 	};
 };

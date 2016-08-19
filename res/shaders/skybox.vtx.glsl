@@ -21,7 +21,11 @@ out pixel_t pixel;
 void main()
 {
     //Trasforma il vertice
-    gl_Position = camera.proj * camera.view  * vec4(position, 1.0);
+    vec4 result = camera.proj * camera.view  * vec4(position, 1.0);
 
-	pixel.uvt = position;
+	//Usa W al posto di Z per fallire sempre nel depth test
+	gl_Position = result.xyww;
+
+    //Non ho la benché minima idea del perchè sia necessario flippare y per raddrizzare la cubemap...
+	pixel.uvt = vec3(position.x, -position.y, position.z);
 }

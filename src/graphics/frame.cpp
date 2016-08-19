@@ -1,6 +1,6 @@
 #include "frame.hpp"
 
-#include "shape.hpp"
+#include "model.hpp"
 
 namespace RedFox
 {

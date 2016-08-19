@@ -1,7 +1,10 @@
 #pragma once
 
 #include "../common.hpp"
-#include "../graphics/renderer.hpp"
+#include "../meta/singleton.hpp"
+#include "../graphics/model.hpp"
+#include "../graphics/frame.hpp"
+#include "../graphics/cubemap.hpp"
 
 namespace RedFox
 {
@@ -18,17 +21,57 @@ namespace RedFox
 
 		private:
 			u32 m_handle, m_rbo;
-			u32 m_position, m_normal, m_color;
+			u32 m_position, m_normal, m_color, m_depth;
 	};
 
-	class DeferredRenderer
+	class MeshRenderCommand
+	{
+		 public:
+			  MeshRenderCommand(Mesh* _mesh, mat4 _transformation);
+
+		 public:
+			  mat4  transformation;
+			  Mesh* mesh;
+	};
+
+	struct Light
+	{
+		 vec3 position;
+		 vec3 color;
+	};
+
+	//Deferred Mesh Renderer
+	class DeferredRenderer : public Singleton<DeferredRenderer>
 	{
 		public:
-			void submitCommand(const RenderCommand& _command);
+			//Carica tecnica
+			DeferredRenderer();
 
+			//Crea ed aggiunge comando per renderizzare una mesh
+			void submitMeshCommand(Mesh* _mesh, mat4 _transformation);
+
+			//Crea ed aggiunge comando per una luce
+			void submitLightCommand(const Light& _light);
+		  
+			//Setta lo skybox della scena
+			void setSkybox(CubeMap* _skybox);
+
+			//Esegue tutti i comandi
 			void present(const Camera& _camera);
 
 		private:
-			vector<RenderCommand> m_commands;
+			 //Renderizza lo skybox sul fondo della scena
+			 void renderSkybox(const Camera& _camera);
+
+		private:
+			GBuffer m_gBuffer;
+			Technique m_geometryPass, m_lightingPass, m_finalPass;
+
+			Frame m_finalFrame;
+
+			CubeMap* m_skybox;
+
+			vector<MeshRenderCommand> m_meshCommands;
+			vector<Light> m_lights;
 	};
 }

@@ -10,6 +10,7 @@ namespace RedFox
 			CubeMap();
 			CubeMap(const array<str, 6>& _filenames);
 
+			//Usa questa cubemap nel contesto corrente
 			void bind() const;
 
 		private:

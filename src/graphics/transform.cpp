@@ -12,7 +12,7 @@ namespace RedFox
 		mat4 transformation;
 		transformation = glm::translate(transformation, position);
 
-		transformation *= glm::orientate4(orientation);
+		transformation *= glm::orientate4(rotation);
 		transformation = glm::scale(transformation, scale);
 
 		return transformation;

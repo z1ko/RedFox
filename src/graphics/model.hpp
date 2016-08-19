@@ -70,44 +70,77 @@ namespace RedFox
 	using VtxBuffer = Buffer<Vertex>;
 	using IdxBuffer = Buffer<u32>;
 
+	//Rappresenta un insieme di textures
 	class Material
 	{
 		public:
 			Material();
-			//Carica materiale con assimp
 			Material(const aiMaterial* _material);
+			void dispose();
 
-		public:
-			Texture albedo;
+			Material& operator = (const Material& _other);
+
+			//Binda le textures nello shader corrente
+			void enable() const;
+
+		private:
+			Texture m_diffuse;
 	};
 
+	//Rappresenta un VAO
+	class Shape
+	{
+		public:
+			Shape();
+			Shape(const aiMesh* _mesh);
+			Shape(const vector<Vertex>& _vertices, const vector<u32>& _indices);
+			void dispose();
+
+			Shape& operator = (const Shape& _other);
+
+			//Renderizza la forma
+			void render() const;
+
+		public:
+			 static Shape Screen();
+			 static Shape Cube();
+
+		private:
+			u32 m_vao, m_count, m_vbo, m_ebo;
+	};
+
+	//Rappresenta l'unione di forma e materiale
 	class Mesh
 	{
 		public:
-			Mesh();
-			//Crea mesh tramite assimp
-			Mesh(const aiScene* _scene, const aiMesh* _mesh);
+			 Mesh();
+			 Mesh(const aiMesh* _mesh, const aiMaterial* _material);
+			 void dispose();
 
-			//Renderizza mesh
-			void render() const;
+			 Mesh& operator = (const Mesh& _other);
+
+			 //Usa il materiale e renderizza la forma
+			 void render() const;
 
 		private:
-			u32 m_vao, m_vbo, m_ebo, m_count;
-			Material m_material;
+			 Shape m_shape;
+			 Material m_material;
 	};
 
 	class Model
 	{
-		public:
-			Model();
-			//Carica mesh da file
-			Model(const str& _filename);
+		 public:
+			  Model();
+			  Model(const str& _filename);
+			  void dispose();
 
-			//Renderizza tutte le mesh
-			void render();
+			  Model& operator = (const Model& _other);
 
-		private:
-			vector<Mesh> m_meshes;
+			  //Renderizza tutte le mesh
+			  void render() const;
+
+		 private:
+			  vector<Mesh> m_meshes;
 	};
 
 }
