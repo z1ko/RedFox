@@ -9,6 +9,8 @@
 #include "graphics/deferred.hpp"
 #include "graphics/scene.hpp"
 
+#include "core/nodegraph.hpp"
+
 using namespace RedFox;
 
 const array<str, 6> faces =
@@ -74,6 +76,17 @@ class Sandbox : public Application
 int main(int _argc, char** _argv)
 {
 	RedFox::Engine engine;
+
+	RedFox::Scene scene;
+	Node world = scene.create();
+
+	Node player = world.populate();
+	player.assign<u32>();
+
+	Node enemy = world.populate();
+	enemy.assign<u16>();
+
+	bool value = player.isParentOf(enemy);
 
 	engine.initialize(_argc, _argv);
 	engine.execute(new Sandbox);
