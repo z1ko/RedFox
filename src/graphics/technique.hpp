@@ -62,7 +62,7 @@ namespace RedFox
 			void setSamplers(const vector<Sampler>& _samplers);
 
 			void setCamera(const Camera& _camera);
-			void setTransform(const Transform& _transform);
+			void setTransform(const Transf& _transform);
 			
 			u32 location(const str& _name);
 

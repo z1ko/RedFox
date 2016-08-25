@@ -29,6 +29,7 @@
 
 //Caricamento immagini
 #include "../ext/freeimage/include/FreeImage.h"
+#include "../ext/soil/include/SOIL.h"
 
 #define RFX_ASSERT(expr) assert(expr)
 

@@ -26,6 +26,5 @@ void main()
 	//Usa W al posto di Z per fallire sempre nel depth test
 	gl_Position = result.xyww;
 
-    //Non ho la benché minima idea del perchè sia necessario flippare y per raddrizzare la cubemap...
-	pixel.uvt = vec3(position.x, -position.y, position.z);
+	pixel.uvt = position;
 }

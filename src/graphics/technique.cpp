@@ -163,12 +163,12 @@ namespace RedFox
 		setUniform("camera.proj", _camera.proj());
 	}
 
-	void Technique::setTransform(const Transform& _transform)
+	void Technique::setTransform(const Transf& _transform)
 	{
-		mat4 model = _transform.model();
-		setUniform("instance.model", model);
+		mat4 world = _transform.world();
+		setUniform("instance.model", world);
 
-		mat3 normalizer = glm::transpose(glm::inverse(mat3(model)));
+		mat3 normalizer = glm::transpose(glm::inverse(mat3(world)));
 		setUniform("instance.normalizer", normalizer);
 	}
 

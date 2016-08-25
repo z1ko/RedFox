@@ -2,32 +2,6 @@
 
 namespace RedFox
 {
-	Transform::Transform()
-		: scale(1,1,1), m_dirty(true), m_parent(nullptr)
-	{
-	}
-
-	//Setta il parente di questo transform
-	void Transform::attachTo(Transform* _parent)
-	{
-		 m_parent = _parent;
-	}
-
-	mat4 Transform::model() const
-	{
-		mat4 transformation;
-		transformation = glm::translate(transformation, position);
-
-		transformation *= glm::orientate4(rotation);
-		transformation = glm::scale(transformation, scale);
-
-		if (m_parent != nullptr)
-			 transformation *= m_parent->model();
-
-		return transformation;
-	}
-
-	//===============================================================================
 
 	Transf::Transf()
 		 : m_dirty(true), m_scale(1,1,1)

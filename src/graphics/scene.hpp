@@ -25,7 +25,7 @@ namespace RedFox
 				inline u32 size() const { return m_children.size(); }
 
 				//Modifica il transform corrente
-				void setTransform(const Transform& _transform);
+				void setTransform(const Transf& _transform);
 
 				//Ritorna il transform corrente
 				inline auto getTransform() const { return m_transform; }
@@ -50,7 +50,7 @@ namespace RedFox
 				virtual void submit() = 0;
 
 		  protected:
-				Transform m_transform;
+			    Transf m_transform;
 
 				//transform del nodo padre
 				mat4 m_world;

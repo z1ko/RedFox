@@ -18,44 +18,17 @@ namespace RedFox
 		{
 			 str path = Globals::Directories::Textures + _filenames[i];
 
-			 //Controlla il formato dell'immagine
-			 FREE_IMAGE_FORMAT format = FreeImage_GetFileType(path.c_str(), 0);
-			 if (format == FIF_UNKNOWN)
-			 {
-				  RFX_WARNING("Impossibile identificare formato immagine, verra' usata l'estensione del file");
+			 i32 width, height;
+			 BYTE* bitmap = SOIL_load_image(path.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
 
-				  format = FreeImage_GetFIFFromFilename(path.c_str());
-				  if (!FreeImage_FIFSupportsReading(format))
-				  {
-						RFX_ERROR("Impossibile caricare immagine, formato non supportato");
-						exit(-1);
-				  }
-			 }
-			 //Carica immagine
-			 FIBITMAP* bitmap = FreeImage_Load(format, path.c_str());
+			 glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height,
+							  0, GL_RGB, GL_UNSIGNED_BYTE, bitmap);
 
-			 //Le immagini vengono salvate nella VRAM con 24 bpp
-			 FIBITMAP* bitmap24 = nullptr;
-			 if (FreeImage_GetBPP(bitmap) != 24)
-			 {
-				  RFX_WARNING("L'immagine non ha 24bpp, verra' convertita");
-				  bitmap24 = FreeImage_ConvertTo32Bits(bitmap);
-				  FreeImage_Unload(bitmap);
-			 }
-			 else
-			 {
-				  RFX_MESSAGE("L'immagine ha 24bpp, perfetto");
-				  bitmap24 = bitmap;
-			 }
-
-			 glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, FreeImage_GetWidth(bitmap24), FreeImage_GetHeight(bitmap24),
-							  0, GL_RGB, GL_UNSIGNED_BYTE, FreeImage_GetBits(bitmap24));
-
-			 FreeImage_Unload(bitmap24);
+			 SOIL_free_image_data(bitmap);
 		}
 
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

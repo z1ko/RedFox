@@ -22,14 +22,15 @@ namespace RedFox
 	 };
 
 	//Contenitore che riusa la memoria allocata
-	template<typename T>
+	template<typename T, u32 S = RFX_POOL_CAPACITY>
 	class Pool
 	{
+
 		 public:
 			  Pool()
 					: m_last(0)
 			  {
-					for (u32 i = 0; i < RFX_POOL_CAPACITY; ++i)
+					for (u32 i = 0; i < S; ++i)
 					{
 						 m_indices[i] = i;
 						 m_generations[i] = 0;
@@ -84,9 +85,9 @@ namespace RedFox
 
 		 private:
 			  u32 m_last;
-			  u32 m_indices[RFX_POOL_CAPACITY];
-			  u32 m_generations[RFX_POOL_CAPACITY];
+			  u32 m_indices[S];
+			  u32 m_generations[S];
 
-			  T m_elements[RFX_POOL_CAPACITY];
+			  T m_elements[S];
 	};
 }

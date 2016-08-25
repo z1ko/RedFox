@@ -10,14 +10,16 @@
 #include "graphics/scene.hpp"
 #include "graphics/renderer.hpp"
 
+#include "experimental/scenegraph.hpp"
+
 using namespace RedFox;
 
 const array<str, 6> faces =
 {
 	 "skyboxes/right.jpg",
 	 "skyboxes/left.jpg",
-	 "skyboxes/bottom.jpg",
 	 "skyboxes/top.jpg",
+	 "skyboxes/bottom.jpg",
 	 "skyboxes/back.jpg",
 	 "skyboxes/front.jpg",
 };
@@ -27,7 +29,7 @@ Camera* camera;
 class Sandbox : public Application
 {
 	 RootNode Root;
-	 LightNode* light1;
+	 LightNode *light1, *light2;
 	 CubeMap* skybox;
 
 	public:
@@ -44,11 +46,12 @@ class Sandbox : public Application
 			 Root.addChild(new ModelNode("nanosuit.obj"));
 			 Root[0].setPosition(vec3(0, 0, 0));
 
-			 light1 = new LightNode(vec3(1.f, 1.f, 1.f));
+			 light1 = new LightNode(vec3(1.f, 0.f, 0.f));
 			 Root.addChild(light1);
 
-			 //light2 = new LightNode(vec3(0.f, 0.f, 1.f));
-			 //root.addChild(light2);
+			 light2 = new LightNode(vec3(0.f, 0.f, 1.f));
+			 Root.addChild(light2);
+
 		}
 
 		void onUpdate()
@@ -57,11 +60,11 @@ class Sandbox : public Application
 
 			 Root.update(mat4(), false, 0);
 
+			 light1->setPosition(vec3(sin(delta * 1.5f) * 10.f, 10.f, cos(delta * 1.5f) * 10.f));
+			 light2->setPosition(vec3(10.f, cos(delta * 1.5f) * 10.f, sin(delta * 1.5f) * 10.f));
+
 			 static DeferredRenderer& renderer = DeferredRenderer::instance();
 			 renderer.present(*camera);
-
-			 light1->setPosition(vec3(sin(delta * 1.5f) * 10.f, 10.f, cos(delta * 1.5f) * 10.f));
-			 //light2->setPosition(vec3(10.f, cos(delta * 2.5f) * 10.f, sin(delta * 2.5f) * 10.f));
 
 			 delta += 0.1f;
 		}
@@ -73,6 +76,12 @@ class Sandbox : public Application
 
 int main(int _argc, char** _argv)
 {
+	Exp::Scene scene;
+	Exp::NodePtr root = scene.instantiate();
+
+	Exp::NodePtr nanosuit = scene.instantiate();
+	nanosuit->transform_.attachTo(&root->transform_);
+
 	RedFox::Engine engine;
 
 	engine.initialize(_argc, _argv);

@@ -5,29 +5,6 @@
 
 namespace RedFox
 {
-	class Transform
-	{
-		public:
-			Transform();
-
-			//Crea trasformazione
-			mat4 model() const;
-
-			//Setta il parente di questo transform
-			void attachTo(Transform* _parent);
-
-		public:
-			vec3 scale;
-			vec3 position;
-			vec3 rotation;
-
-	   private:
-			 Transform* m_parent;
-
-			 mat4 m_world;
-			 bool m_dirty;
-	};
-
 	class NodeComponent;
 
 	//Classe che rappresenta una trasformazione e che crea la gerarchia della scena

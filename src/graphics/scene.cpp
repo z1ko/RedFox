@@ -27,8 +27,8 @@ namespace RedFox
 		  _dirty |= m_dirty;
 		  if(m_dirty)
 		  {
-				printf("Aggiornamento trasformazione [%i]\n", _depth);
-				m_world = m_transform.model() * _world;
+				//printf("Aggiornamento trasformazione [%i]\n", _depth);
+				m_world = m_transform.world() * _world;
 				m_dirty = false;
 		  }
 
@@ -47,7 +47,7 @@ namespace RedFox
 	 }
 
 	 //Modifica il transform corrente
-	 void SceneNode::setTransform(const Transform& _transform)
+	 void SceneNode::setTransform(const Transf& _transform)
 	 {
 		  m_transform = _transform;
 		  m_dirty = true;
@@ -56,39 +56,39 @@ namespace RedFox
 	 //Muove il nodo
 	 void SceneNode::translate(const vec3& _vector)
 	 {
-		  m_transform.position += _vector;
+		 m_transform.setPosition(m_transform.position() + _vector);
 		  m_dirty = true;
 	 }
 
 	 void SceneNode::setPosition(const vec3& _vector)
 	 {
-		  m_transform.position = _vector;
+		  m_transform.setPosition(_vector);
 		  m_dirty = true;
 	 }
 
 	 //Ruota il nodo
 	 void SceneNode::rotate(const vec3& _vector)
 	 {
-		  m_transform.rotation += _vector;
+		  m_transform.setRotation(m_transform.rotation() + _vector);
 		  m_dirty = true;
 	 }
 
 	 void SceneNode::setRotation(const vec3& _vector)
 	 {
-		  m_transform.rotation = _vector;
+		  m_transform.setRotation(_vector);
 		  m_dirty = true;
 	 }
 
 	 //Scala il nodo
 	 void SceneNode::scale(const vec3& _vector)
 	 {
-		  m_transform.scale += _vector;
+		  m_transform.setScale(_vector);
 		  m_dirty = true;
 	 }
 
 	 void SceneNode::setScale(const vec3& _vector)
 	 {
-		  m_transform.scale = _vector;
+		  m_transform.setScale(m_transform.scale() + _vector);
 		  m_dirty = true;
 	 }
 
@@ -146,6 +146,6 @@ namespace RedFox
 	 {
 		  //Facilita l'accesso al renderer
 		  static DeferredRenderer& renderer = DeferredRenderer::instance();
-		  renderer.submitLightCommand({ m_transform.position, color });
+		  renderer.submitLightCommand({ m_transform.position(), color });
 	 }
 }
