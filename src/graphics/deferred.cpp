@@ -5,77 +5,73 @@ namespace RedFox
 	GBuffer::GBuffer(u32 _width, u32 _height)
 	{
 		glGenFramebuffers(1, &m_handle);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_handle);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_handle);
 
-		//Genera texture per le posizioni
-		glGenTextures(1, &m_position);
-		glBindTexture(GL_TEXTURE_2D, m_position);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _width, _height, 0, GL_RGB, GL_FLOAT, nullptr);
+		glGenTextures(3, m_textures);
+
+		//Genera texture per le posizione
+		glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_POSITION]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _width, _height, 0, GL_RGB, GL_FLOAT, NULL);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_position, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textures[GBUFFER_POSITION], 0);
+
+		//=================================================================================================================
 
 		//Genera texture per le normali
-		glGenTextures(1, &m_normal);
-		glBindTexture(GL_TEXTURE_2D, m_normal);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _width, _height, 0, GL_RGB, GL_FLOAT, nullptr);
-
+		glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_NORMAL]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _width, _height, 0, GL_RGB, GL_FLOAT, NULL);
+		
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_textures[GBUFFER_NORMAL], 0);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normal, 0);
+		//=================================================================================================================
 
 		//Genera texture per i colori
-		glGenTextures(1, &m_color);
-		glBindTexture(GL_TEXTURE_2D, m_color);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _width, _height, 0, GL_RGB, GL_FLOAT, nullptr);
-
+		glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_ALBEDO]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _width, _height, 0, GL_RGB, GL_FLOAT, NULL);
+		
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_textures[GBUFFER_ALBEDO], 0);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_color, 0);
-
-		//Genera texture per la profondità
-		glGenTextures(1, &m_depth);
-		glBindTexture(GL_TEXTURE_2D, m_depth);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _width, _height, 0, GL_RGB, GL_FLOAT, nullptr);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, m_depth, 0);
+		//=================================================================================================================
 
 		//Setta su quali textures avviene il rendering
-		u32 attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-		glDrawBuffers(4, attachments);
+		u32 attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		glDrawBuffers(3, attachments);
+		  
+		//=================================================================================================================
 
-		//Crea render buffer per la depth map e la stencil map
+		//Crea il depth e stencil render buffer object
 		glGenRenderbuffers(1, &m_rbo);
 		glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-		//Assegna il renderbuffer al framebuffer
+		//Applica rbo al gbuffer
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
 
+		//=================================================================================================================
+
 		//Controlla che il framebuffer sia stato creato correttamente
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		u32 status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
 			exit(-1);
 		}
 
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void GBuffer::bindForWriting() const
+	void GBuffer::bind(u32 mode) const
 	{
-		 glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_handle);
-	}
-
-	void GBuffer::bindForReading() const
-	{
-		 glBindFramebuffer(GL_READ_FRAMEBUFFER, m_handle);
+		glBindFramebuffer(mode, m_handle);
 	}
 
 	void GBuffer::unbind() const
@@ -86,16 +82,13 @@ namespace RedFox
 	void GBuffer::bindTextures() const
 	{
 		 glActiveTexture(GL_TEXTURE0);
-		 glBindTexture(GL_TEXTURE_2D, m_position);
+		 glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_POSITION]);
 
 		 glActiveTexture(GL_TEXTURE1);
-		 glBindTexture(GL_TEXTURE_2D, m_normal);
+		 glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_NORMAL]);
 
 		 glActiveTexture(GL_TEXTURE2);
-		 glBindTexture(GL_TEXTURE_2D, m_color);
-
-		 glActiveTexture(GL_TEXTURE3);
-		 glBindTexture(GL_TEXTURE_2D, m_depth);
+		 glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_ALBEDO]);
 	}
 
 	//====================================================================================================================
@@ -134,12 +127,22 @@ namespace RedFox
 		 //====================================================================================
 
 		 m_finalPass.initialize()
-						.attach(Shader("skybox.vtx.glsl", GL_VERTEX_SHADER))
-						.attach(Shader("skybox.frg.glsl", GL_FRAGMENT_SHADER))
+						.attach(Shader("final.vtx.glsl", GL_VERTEX_SHADER))
+						.attach(Shader("final.frg.glsl", GL_FRAGMENT_SHADER))
 						.link();
 
 		 m_finalPass.enable();
-		 m_finalPass.setUniform("skybox", 0u);
+		 m_finalPass.setUniform("fram", 0u);
+
+		 //====================================================================================
+
+		 m_skyboxPass.initialize()
+					    .attach(Shader("skybox.vtx.glsl", GL_VERTEX_SHADER))
+					    .attach(Shader("skybox.frg.glsl", GL_FRAGMENT_SHADER))
+					    .link();
+
+		 m_skyboxPass.enable();
+		 m_skyboxPass.setUniform("skybox", 0u);
 	}
 
 	//Crea ed aggiunge comando per renderizzare una mesh
@@ -163,37 +166,38 @@ namespace RedFox
 	//Renderizza lo skybox sul fondo della scena
 	void DeferredRenderer::renderSkybox(const Camera& _camera)
 	{
-		 //Cambia funzione del depth test, per non sovrascrivere l'immagine già presente nel frame
-		 glDepthFunc(GL_LEQUAL);
-		 glDisable(GL_CULL_FACE);
+		static Shape cube = Shape::Cube();
 
-		 m_finalPass.enable();
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
 
-		 //Elimina la traslazione e setta gli uniforms
-		 m_finalPass.setUniform("camera.view", mat4(mat3(_camera.view())));
-		 m_finalPass.setUniform("camera.proj", _camera.proj());
+		m_skyboxPass.enable();
 
-		 //Usa lo skybox
-		 m_skybox->bind();
+		//Elimina traslazione
+		mat4 view = mat4(mat3(_camera.view()));
+		m_skyboxPass.setUniform("camera.view", view);
+		m_skyboxPass.setUniform("camera.proj", _camera.proj());
 
-		 //Cubo dello skybox
-		 static Shape cube = Shape::Cube();
-		 cube.render();
+		m_skybox->bind();
+		cube.render();
 
-		 //Ritorna alla funzione standard
-		 glDepthFunc(GL_LESS);
-		 glEnable(GL_CULL_FACE);
+		glDepthFunc(GL_LESS);
 	}
 
 	//Esegue tutti i comandi
 	void DeferredRenderer::present(const Camera& _camera)
 	{
+		//Per qualche oscuro motivo il depth testing non funziona piu
+
 		 //Quadrato che copre tutto lo schermo
 		 static Shape screen = Shape::Screen();
 
+		 //Attiva il depth test, renderizzare gli oggetti in ordine di profondità
+		 glEnable(GL_DEPTH_TEST);
+
 		 //Inizio rendering scena
-		 m_gBuffer.bindForWriting();
-		 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		 m_gBuffer.bind(GL_DRAW_FRAMEBUFFER);
+		 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		 m_geometryPass.enable();
 		 m_geometryPass.setCamera(_camera);
@@ -211,15 +215,11 @@ namespace RedFox
 			  command.mesh->render();
 		 }
 
-		 //Fine rendering scena
+		 //Fine rendering scena e pulisce backbuffer principale
 		 m_gBuffer.unbind();
 
 		 //Resetta vettore comandi
 		 m_meshCommands.clear();
-
-		 //Renderizza luci sul frame finale
-		 //m_finalFrame.enable();
-		 //glClear(GL_COLOR_BUFFER_BIT);
 
 		 m_lightingPass.enable();
 		 m_lightingPass.setUniform("camera.position", _camera.position);
@@ -239,44 +239,22 @@ namespace RedFox
 		 //Resetta vettore luci
 		 m_lights.clear();
 
-		 //Binda textures del gbuffer per il lighting pass e renderizza sul frame
+		 //Renderizza tutte le luci
 		 m_gBuffer.bindTextures();
 		 screen.render();
 
-		 //Finisce di renderizzare luci
-		 //m_finalFrame.disable();
-		 //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		 //Copia il depth buffer
+		 m_gBuffer.bind(GL_READ_FRAMEBUFFER);
+		 glBlitFramebuffer(0, 0, RFX_WINDOW_WIDTH, RFX_WINDOW_HEIGHT, 0, 0, RFX_WINDOW_WIDTH, RFX_WINDOW_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
-		 //Renderizza sul backbuffer
-
-		 //Cambia funzione del depth test, per non sovrascrivere l'immagine già presente nel frame
-		 //glDepthFunc(GL_LEQUAL);
-		 //glDisable(GL_CULL_FACE);
-
-		 //m_finalPass.enable();
-
-		 //Elimina la traslazione e setta gli uniforms
-		 //m_finalPass.setUniform("camera.view", mat4(mat3(_camera.view())));
-		 //m_finalPass.setUniform("camera.proj", _camera.proj());
-
-		 //Usa lo skybox
-		 //m_skybox->bind();
-
-		 //Cubo dello skybox
-		 //static Shape cube = Shape::Cube();
-		 //cube.render();
-
-		 //Ritorna alla funzione standard
-		 //glDepthFunc(GL_LESS);
-		 //glEnable(GL_CULL_FACE);
+		 //Renderizza lo skybox
+		 renderSkybox(_camera);
 
 		 //===================================================================================================================
 		 //Visualizza textures del gbuffer per debug
 
-		 m_gBuffer.bindForReading();
-
-		 //glReadBuffer(GL_COLOR_ATTACHMENT3);
-		 //glBlitFramebuffer(0, 0, 1600, 900, 0, 900 * 0.75f, 1600 * 0.25f, 900, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		 m_gBuffer.bind(GL_READ_FRAMEBUFFER);
+		 glBindFramebuffer(GL_DRAW_BUFFER, 0);
 
 		 glReadBuffer(GL_COLOR_ATTACHMENT2);
 		 glBlitFramebuffer(0, 0, 1600, 900, 0, 900 * 0.50f, 1600 * 0.25f, 900 * 0.75f, GL_COLOR_BUFFER_BIT, GL_LINEAR);
@@ -287,6 +265,9 @@ namespace RedFox
 		 glReadBuffer(GL_COLOR_ATTACHMENT0);
 		 glBlitFramebuffer(0, 0, 1600, 900, 0, 0, 1600 * 0.25f, 900 * 0.25f, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-		 m_gBuffer.unbind();
+		 m_gBuffer.unbind(); 
+
+		 //Breakpoint
+		 glColor3f(0.0f, 0.0f, 0.0f);
 	}
 }

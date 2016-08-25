@@ -6,6 +6,7 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <typeindex>
 #include <unordered_map>
 
 //Opengl
@@ -64,6 +65,7 @@ namespace RedFox
 	using str = std::string;
 	using std::stringstream;
 
+	using std::type_index;
 	using std::vector;
 	using std::array;
 

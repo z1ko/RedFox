@@ -1,105 +1,136 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../core/events.hpp"
 #include "../memory/pool.hpp"
 
 namespace RedFox
 {
-	 class NodeDescription;
+	 class Node;
+	 class Transf;
 
 	 //Descrive come si comporta un nodo
 	 class NodeComponent
 	 {
+		  public:
+				NodeComponent();
+
+				//Setta nodo a cui appartiene il componente
+				virtual void attachTo(Node* _owner);
+
+				//Ritorna nodo a cui appartiene il componente
+				inline Node* node() const { return m_owner; }
+
+		  protected:
+				//Nodo a cui appartiene il componente
+				Node* m_owner;
 	 };
 
-	 //Rappresenta una singola unità logica (wrapper)
+	 //Componente specializzato per il rendering, 
+	 //contiene un pointer al transform nel nodo a cui appartiene, per comodità
+	 class GraphicComponent : public NodeComponent
+	 {
+		  public:
+				//Setta owner e ottiene transform
+				virtual void attachTo(Node* _owner) override;
+
+		  public:
+				Transf* transform;
+	 };
+
 	 class Node
 	 {
-		  friend class Scene;
-
 		  public:
-				//Crea nodo fasullo
+				//Aggiunge un transform di base
 				Node();
+				Node(const str& _name);
 
-				//Distrugge il nodo e tutti i suoi figli
-				void destroy();
+				//Ritorna nome del nodo, per identificarlo
+				inline str name() const { return m_name; }
 
-		  private:
-				//Solo la scena o un altro nodo puo costruire un nodo
-				Node(Scene* _scene, const Key<NodeDescription>& _key);
-
-		  public:
-				//Crea un figlio
-				Node populate();
-
-				//Ritorna il parente di questo nodo
-				Node& parent();
-
-				//Ritorna il vettore contenete i figli di questo nodo
-				auto& children();
-
-				//Controlla se questo nodo è figlio (Non recursivo)
-				bool isChildOf(const Node& _node);
-
-				//Controlla se esiste questo figlio (Non recursivo)
-				bool isParentOf(const Node& _node);
-
-				//Operatori
-				bool operator == (const Node& _other) const;
-
-				//Assegna un componente
+				//Assegna un componente al nodo e informa l'engine
 				template<class T, class ... Ts>
-				void assign(Ts&& ... args)
+				T* assign(Ts&& ... args)
 				{
+					 //Alloca componente
+					 T* component = new T(std::forward<Ts>(args)...);
+					 m_components[typeid(T)] = component;
+
+					 //Setta proprietario del componente
+					 component->attachTo(this);
+
+					 //Informa tutta l'engine
+					 Events::ComponentCreation(this, component);
+
+					 return component;
+				};
+
+				//Ritorna un componente se esiste
+				template<class T>
+				T* retrive()
+				{
+					 if (m_components.find(typeid(T)) != m_components.end())
+						  return (T*)m_components.at(typeid(T));
+
+					 return nullptr;
 				}
 
-				//Rimuove un componente
+				//Dealloca un componente e informa l'engine
 				template<class T>
 				void remove()
 				{
+					 if (m_components.find(typeid(T)) == m_components.end())
+					 {
+						  //Il componente non esiste
+						  return;
+					 }
+					
+					 //Trova componente
+					 T* component = m_components.at(typeid(T));
+					 m_components.erase(typeid(T));
+
+					 //Informa tutta l'engine
+					 Events::ComponentDeletion(this, component);
+
+					 //Dealloca componente
+					 delete component;
 				}
 
-		  private:
-				//Aggiunge un figlio
-				void attach(Node& _child);
-
-				//Rimuove un figlio di prima generazione
-				void detach(const Node& _child);
-
-		  private:
-				//Oggetto che dirigge questo nodo
-				Scene* m_scene;
-
-				//Premette di accedere alla descrizione di questo nodo
-				Key<NodeDescription> m_key;
-	 };
-
-	 //Descrive una determinata unità logica
-	 struct NodeDescription
-	 {
-		  //Nodo di cui questo nodo è figlio
-		  Node parent;
-
-		  //Figli di questo nodo
-		  vector<Node> children;
-	 };
-
-	 //Classe che crea, dirigge e distrugge i nodi
-	 class Scene
-	 {
-		  friend class Node;
-
 		  public:
-				Scene();
-
-				//Crea un nuovo nodo figlio della root
-				Node create();
+				//Transform di base
+				Transf* transform;
 
 		  private:
-				//Nodo di base a cui sono collegati tutti i nuovi oggetti
-				Node m_root;
+				//Nome del nodo
+				str m_name;
 
-				//Descrive tutti i nodi
-				Pool<NodeDescription> m_descriptions;
+				//Mappa che permette di ottenere i componenti di questo nodo
+				umap<type_index, NodeComponent*> m_components;
 	 };
+	 
+	 //Sistema che processa determinati nodi
+	 class NodeSystem
+	 {
+		  public:
+				//Collega eventi globali
+				NodeSystem();
+
+				//Funzione invocata all'avvio dell'engine
+				virtual void initialize() = 0;
+
+				//Funzione invocata ogni frame
+				virtual void update() = 0;
+
+		  protected:
+				//Callback invocato quando un componente viene assegnato ad un nodo
+				virtual void onComponentCreation(Node*, NodeComponent*) = 0;
+
+				//Callback invocato quando un componente viene eliminato da un nodo
+				virtual void onComponentDeletion(Node*, NodeComponent*) = 0;
+	 };
+
+	 namespace Events
+	 {
+		  extern Event<Node*, NodeComponent*> ComponentCreation, ComponentDeletion;
+	 }
 }

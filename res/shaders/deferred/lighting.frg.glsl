@@ -31,17 +31,19 @@ uniform light_t lights[64];
 out vec4 final_color;
 void main()
 {
+	//Ottiene colore del pixel tramite gbuffer
+    vec4 albedo = texture(gbuffer.color, pixel.uv);
+
+	if(albedo.a == 0.0) discard;
+
     //Ottiene posizione del pixel tramite gbuffer
     vec3 position = texture(gbuffer.position, pixel.uv).rgb;
-    
-    //Ottiene colore del pixel tramite gbuffer
-    vec3 albedo = texture(gbuffer.color, pixel.uv).rgb;
 
     //Ottiene normale del pixel tramire gbuffer
     vec3 normal = texture(gbuffer.normal, pixel.uv).rgb;
 
     //Colore di base
-    final_color = vec4(albedo, 1.0) * 0.3;
+    final_color = albedo * 0.6;
 
     //Direzione frammento - camera
     vec3 view_dir = normalize(camera.position - position);
@@ -55,7 +57,7 @@ void main()
         vec3 half = normalize(view_dir + light_dir);
 
         //Colore diffusivo
-        final_color += vec4(max(dot(normal, light_dir), 0.0) * albedo * lights[i].color, 1.0);
+        final_color += vec4(max(dot(normal, light_dir), 0.0) * vec3(albedo) * lights[i].color, 1.0);
         
         //Colore speculare
         float spec_color = pow(max(dot(normal, half), 0.0), 32);

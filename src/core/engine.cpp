@@ -1,5 +1,7 @@
 #include "engine.hpp"
 
+#include "../graphics/transform.hpp"
+
 namespace RedFox
 {
 	namespace Globals
@@ -16,6 +18,9 @@ namespace RedFox
 		//Crea finestringinga
 		m_window = new Window("RedFox Engine", RFX_WINDOW_WIDTH, RFX_WINDOW_HEIGHT);
 
+		//Crea root nodi
+		m_root = new Node("root");
+
 		//Setta percorsi
 		Globals::Directories::Textures = "C:/Development/RedFox/RedFox/res/textures/";
 		Globals::Directories::Shaders = "C:/Development/RedFox/RedFox/res/shaders/";
@@ -30,6 +35,10 @@ namespace RedFox
 		//Setta componenti applicazione
 		this->connect(_application);
 
+		//Inizializza sistemi
+		for (NodeSystem* system : m_systems)
+			 system->initialize();
+
 		//Crea risorse
 		_application->onInit();
 
@@ -38,7 +47,12 @@ namespace RedFox
 			//Aggiorna scena
 			_application->onUpdate();
 
-			//TODO: renderizza scena
+			//Aggiorna transforms
+			m_root->transform->bake(mat4());
+
+			//Aggiorna sistemi
+			for (NodeSystem* system : m_systems)
+				 system->update();
 		}
 
 		//Libera risorse
@@ -48,6 +62,6 @@ namespace RedFox
 	//Connette tutti i sistemi all'applicazione
 	void Engine::connect(Application* _application)
 	{
-		_application->Window = m_window;
+		_application->root = m_root;
 	}
 }

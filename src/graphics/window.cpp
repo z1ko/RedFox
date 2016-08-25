@@ -9,6 +9,9 @@ namespace RedFox
 		//Carica dll glfw
 		glfwInit();
 
+		glfwWindowHint(GLFW_STENCIL_BITS, true);
+		glfwWindowHint(GLFW_DEPTH_BITS, true);
+
 		m_handle = glfwCreateWindow(_width, _height, _title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_handle);
 
@@ -25,9 +28,6 @@ namespace RedFox
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glViewport(0, 0, _width, _height);
 
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_DEPTH_TEST);
-
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
@@ -35,7 +35,7 @@ namespace RedFox
 	bool Window::update()
 	{
 		glfwSwapBuffers(m_handle);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		glfwPollEvents();
 

@@ -2,7 +2,7 @@
 
 #include "../common.hpp"
 #include "../core/events.hpp"
-#include "../resources/resources.hpp"
+#include "../core/nodegraph.hpp"
 
 #include "../graphics/window.hpp"
 
@@ -24,8 +24,8 @@ namespace RedFox
 			virtual void onShutdown() = 0;
 
 		public:
-			//Finestringinga
-			Window* Window;
+			//Root di tutti i nodi dell'applicazione
+			Node* root;
 	};
 
 	//Classe principale
@@ -35,6 +35,14 @@ namespace RedFox
 			//Punto di ingresso
 			void initialize(int _argc, char** _argv);
 
+			//Installa un sistema
+			template<typename T>
+			T* install()
+			{
+				 m_systems.push_back(new T);
+				 return (T*)m_systems.back();
+			}
+
 			//Esegue un applicazione, blocca esecuzione
 			void execute(Application* _application);
 
@@ -43,7 +51,13 @@ namespace RedFox
 			void connect(Application* _application);
 
 		private:
-			//Finestringinga
+			//Finestra
 			Window* m_window;
+
+			//Root di tutti i nodi dell'applicazione
+			Node* m_root;
+
+			//Systemi usato dall'engine
+			vector<NodeSystem*> m_systems;
 	};
 }

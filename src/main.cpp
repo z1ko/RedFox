@@ -8,8 +8,7 @@
 #include "graphics/transform.hpp"
 #include "graphics/deferred.hpp"
 #include "graphics/scene.hpp"
-
-#include "core/nodegraph.hpp"
+#include "graphics/renderer.hpp"
 
 using namespace RedFox;
 
@@ -23,26 +22,30 @@ const array<str, 6> faces =
 	 "skyboxes/front.jpg",
 };
 
+Camera* camera;
+
 class Sandbox : public Application
 {
-	 RootNode root;
+	 RootNode Root;
+	 LightNode* light1;
+	 CubeMap* skybox;
 
 	public:
 		void onInit()
 		{
+			 camera = new Camera(glm::perspective(glm::radians(70.0f), 16.0f / 9.0f, 0.1f, 100.0f));
+			 camera->position = vec3(0, 7, 14);
+
 			 static DeferredRenderer& renderer = DeferredRenderer::instance();
 
 			 skybox = new CubeMap(faces);
 			 renderer.setSkybox(skybox);
 
-			 camera = new Camera(glm::perspective(glm::radians(70.0f), 16.0f / 9.0f, 0.1f, 100.0f));
-			 camera->position = vec3(0, 7, 14);
-
-			 root.addChild(new ModelNode("nanosuit.obj"));
-			 root[0].setPosition(vec3(0, 0, 0));
+			 Root.addChild(new ModelNode("nanosuit.obj"));
+			 Root[0].setPosition(vec3(0, 0, 0));
 
 			 light1 = new LightNode(vec3(1.f, 1.f, 1.f));
-			 root.addChild(light1);
+			 Root.addChild(light1);
 
 			 //light2 = new LightNode(vec3(0.f, 0.f, 1.f));
 			 //root.addChild(light2);
@@ -52,7 +55,7 @@ class Sandbox : public Application
 		{
 			 static float delta = 0.0f;
 
-			 root.update(mat4(), false, 0);
+			 Root.update(mat4(), false, 0);
 
 			 static DeferredRenderer& renderer = DeferredRenderer::instance();
 			 renderer.present(*camera);
@@ -66,27 +69,11 @@ class Sandbox : public Application
 		void onShutdown()
 		{
 		}
-
-	private:
-		Camera* camera;
-		CubeMap* skybox;
-		LightNode *light1, *light2;
 };
 
 int main(int _argc, char** _argv)
 {
 	RedFox::Engine engine;
-
-	RedFox::Scene scene;
-	Node world = scene.create();
-
-	Node player = world.populate();
-	player.assign<u32>();
-
-	Node enemy = world.populate();
-	enemy.assign<u16>();
-
-	bool value = player.isParentOf(enemy);
 
 	engine.initialize(_argc, _argv);
 	engine.execute(new Sandbox);

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../common.hpp"
-#include "../core/entity.hpp"
 
 #include "texture.hpp"
 #include "technique.hpp"
@@ -138,6 +137,9 @@ namespace RedFox
 
 			  //Renderizza tutte le mesh
 			  void render() const;
+
+			  //Ritorna un vettore con tutte le mesh di questo modello
+			  inline auto& meshes() const { return m_meshes; }
 
 		 private:
 			  vector<Mesh> m_meshes;

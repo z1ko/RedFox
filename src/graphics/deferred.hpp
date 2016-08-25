@@ -11,17 +11,24 @@ namespace RedFox
 	class GBuffer
 	{
 		public:
+			 enum GBUFFER_TEXTURES
+			 {
+				  GBUFFER_POSITION, 
+				  GBUFFER_NORMAL,
+				  GBUFFER_ALBEDO
+			 };
+
+		public:
 			GBuffer(u32 _width, u32 _height);
 
-			void bindForWriting() const;
-			void bindForReading() const;
+			void bind(u32 mode) const;
 			void unbind() const;
 
 			void bindTextures() const;
 
 		private:
 			u32 m_handle, m_rbo;
-			u32 m_position, m_normal, m_color, m_depth;
+			u32 m_textures[3];
 	};
 
 	class MeshRenderCommand
@@ -65,9 +72,10 @@ namespace RedFox
 
 		private:
 			GBuffer m_gBuffer;
-			Technique m_geometryPass, m_lightingPass, m_finalPass;
+			Technique m_geometryPass, m_lightingPass, m_finalPass, m_skyboxPass;
 
 			Frame m_finalFrame;
+			RenderTarget finalTarget_;
 
 			CubeMap* m_skybox;
 

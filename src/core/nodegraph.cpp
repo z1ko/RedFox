@@ -1,112 +1,57 @@
 #include "nodegraph.hpp"
 
+#include "../core/engine.hpp"
+#include "../graphics/transform.hpp"
+
 namespace RedFox
 {
-	 //Crea nodo fasullo
+	 NodeComponent::NodeComponent()
+		  : m_owner(nullptr)
+	 {
+	 }
+
+	 //Setta nodo a cui appartiene il componente
+	 void NodeComponent::attachTo(Node* _owner)
+	 {
+		  m_owner = _owner;
+	 }
+
+	 //==========================================================================
+
+	 //Setta owner e ottiene transform
+	 void GraphicComponent::attachTo(Node* _owner)
+	 {
+		  m_owner = _owner;
+		  transform = _owner->transform;
+	 }
+
+	 //==========================================================================
+
 	 Node::Node()
-		  : m_scene(nullptr)
 	 {
+		  //Aggiunge un transform di base
+		  transform = this->assign<Transf>();
 	 }
 
-	 //Solo la scena o un altro nodo puo costruire un nodo
-	 Node::Node(Scene* _scene, const Key<NodeDescription>& _key)
-		  : m_scene(_scene), m_key(_key)
+	 Node::Node(const str& _name)
+		  : m_name(_name)
 	 {
+		  //Aggiunge un transform di base
+		  transform = this->assign<Transf>();
 	 }
 
-	 //Operatori
-	 bool Node::operator == (const Node& _other) const
+	 //==========================================================================
+
+	 NodeSystem::NodeSystem()
 	 {
-		  return m_key.index == _other.m_key.index
-				&& m_key.generation == _other.m_key.generation;
+		  RFX_CONNECT(NodeSystem, onComponentCreation, Events::ComponentCreation);
+		  RFX_CONNECT(NodeSystem, onComponentDeletion, Events::ComponentDeletion);
 	 }
 
-	 //Crea un figlio
-	 Node Node::populate()
+	 //==========================================================================
+
+	 namespace Events
 	 {
-		  //Crea un nuovo nodo
-		  Node child = m_scene->create();
-		  this->attach(child);
-
-		  return child;
-	 }
-
-	 //Ritorna il parente di questo nodo
-	 Node& Node::parent()
-	 {
-		  return m_scene->m_descriptions[m_key]->parent;
-	 }
-
-	 //Ritorna il vettore contenete i figli di questo nodo
-	 auto& Node::children()
-	 {
-		  return m_scene->m_descriptions[m_key]->children;
-	 }
-
-	 //Controlla se questo nodo è figlio (Non recursivo)
-	 bool Node::isChildOf(const Node& _node)
-	 {
-		  return _node == this->parent();
-	 }
-
-	 //Controlla se esiste questo figlio (Non recursivo)
-	 bool Node::isParentOf(const Node& _node)
-	 {
-		  for (const auto& child : children())
-				if (child == _node) return true;
-
-		  return false;
-	 }
-
-	 //Rimuove un figlio di prima generazione
-	 void Node::detach(const Node& _child)
-	 {
-		  auto& children = this->children();
-		  for(u32 i = 0; i < children.size(); i++)
-		  {
-				if (children[i] == _child)
-					 children.erase(children.begin() + i);
-		  }
-	 }
-
-	 //Aggiunge un figlio
-	 void Node::attach(Node& _child)
-	 {
-		  _child.parent().detach(_child);
-
-		  _child.parent() = *this;
-		  children().push_back(_child);
-	 }
-
-	 //Distrugge il nodo e tutti i suoi figli
-	 void Node::destroy()
-	 {
-		  this->parent().detach(*this);
-
-		  for (auto& child : children())
-				child.destroy();
-
-		  m_scene->m_descriptions.remove(m_key);
-	 }
-
-	 //=============================================================================
-
-	 Scene::Scene()
-	 {
-		  m_root = Node(this, m_descriptions.emplace());
-	 }
-
-	 //Crea un nuovo nodo figlio della root
-	 Node Scene::create()
-	 {
-		  //Trova un nuovo descrittore libero e lo usa per questo nuovo nodo
-		  Key<NodeDescription> key = m_descriptions.emplace();
-		  Node result = Node(this, key);
-
-		  //Registra il nodo
-		  result.parent() = m_root;
-		  m_root.children().push_back(result);
-
-		  return Node(this, key);
+		  Event<Node*, NodeComponent*> ComponentCreation, ComponentDeletion;
 	 }
 }
